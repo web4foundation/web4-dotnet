@@ -590,7 +590,7 @@ public partial class JsonRpcWriter : IDisposable
     private static void GrowSizeHint(ref int sizeHint)
     {
         sizeHint *= 2;
-        if (sizeHint > (2 ^ 20)) // 1MB
+        if (sizeHint > (2 << 20)) // 1MB
             throw new NotSupportedException("🛑 It seems a keyhole value with a format string needed a buffer > 1MB.  Probably misuse?  Needs investigation.");
     }
 
