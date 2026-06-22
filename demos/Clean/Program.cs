@@ -14,7 +14,15 @@ Color color = Color.FromArgb(0xf2f2f7);
 bool b = true;
 
 app.MapWindow("/list", () => $"""
-    {GetList()}
+    <!doctype html>
+    <html>
+        <head>
+            <title>Clean</title>
+        </head>
+        <body>
+            {GetList()}
+        </body>
+    </html>
     """);
 
 Html GetList() => $"""
