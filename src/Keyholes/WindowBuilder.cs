@@ -291,12 +291,12 @@ public class WindowBuilder :
     private string CreateListenerString(string? format, string type, string target, string key, string options) => format switch
     {
         // Serialize nothing – the event object is never used
-        "" => $"{target}.addEventListener('{type}', e => keyholes['{key}'].dispatchEvent(e), {options}); keyholes.set('{key}', {target});",
+        "" => $"{target}.addEventListener('{type}', e => {{ keyholes.set('{key}', {target}); keyholes['{key}'].dispatchEvent(e); }});",
 
         // Serialize the event – the event object is needed
-        null => $"{target}.addEventListener('{type}', e => keyholes['{key}'].dispatchEvent(e, '*'), {options}); keyholes.set('{key}', {target});",
+        null => $"{target}.addEventListener('{type}', e => {{ keyholes.set('{key}', {target}); keyholes['{key}'].dispatchEvent(e, '*'); }});",
 
         // Serialize selectively – only a few properties are ever used
-        _ => $"{target}.addEventListener('{type}', e => keyholes['{key}'].dispatchEvent(e, '{format}'), {options}); keyholes.set('{key}', {target});",
+        _ => $"{target}.addEventListener('{type}', e => {{ keyholes.set('{key}', {target}); keyholes['{key}'].dispatchEvent(e, '{format}'); }});",
     };
 }
