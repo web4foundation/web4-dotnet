@@ -9,6 +9,7 @@
     <Project Path="benchmarks/Rendering/Rendering.csproj" />
   </Folder>
   <Folder Name="/demos/">
+    <Project Path="demos/Rotate/Rotate.csproj" />
     <Project Path="demos/Clean/Clean.csproj" />
     <Project Path="demos/List/List.csproj" />
     <Project Path="demos/Wasm/Wasm.csproj" />

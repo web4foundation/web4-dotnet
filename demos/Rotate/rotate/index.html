@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phone 3-Axis Rotation • Square Demo</title>
+  <style>
+    :root {
+      --bg: #0a0b14;
+      --panel: #12141f;
+      --accent: #6366f1;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --front: linear-gradient(135deg, #6366f1, #a855f7);
+      --back: linear-gradient(135deg, #f43f5e, #fb923c);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .header h1 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.3;
+    }
+
+    .scene {
+      width: min(300px, 82vw);
+      height: min(300px, 82vw);
+      perspective: 720px;
+      perspective-origin: 50% 50%;
+      margin: 12px auto 20px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* subtle 3D stage */
+      background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.03) 0%, transparent 70%);
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .square {
+      width: min(240px, 66vw);
+      height: min(240px, 66vw);
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+      border-radius: 14px;
+      box-shadow:
+        0 20px 40px -12px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: transform 0.03s linear;
+      cursor: default;
+      user-select: none;
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: white;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      border-radius: 14px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .front {
+      background: var(--front);
+    }
+
+    .back {
+      background: var(--back);
+      transform: rotateY(180deg);
+    }
+
+    .face-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .face-main {
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .axis {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: center;
+      border-radius: 999px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+
+    .x-axis {
+      width: 58%;
+      height: 4.5px;
+      background: #f87171;
+      transform: translate(-50%, -50%);
+    }
+
+    .y-axis {
+      width: 4.5px;
+      height: 58%;
+      background: #4ade80;
+      transform: translate(-50%, -50%);
+    }
+
+    .z-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 21px;
+      height: 21px;
+      border: 3px solid #60a5fa;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #60a5fa;
+      background: rgba(15, 23, 42, 0.35);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    }
+
+    .readings {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto 18px;
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 14px 14px 10px;
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+    }
+
+    .readings-header {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .readings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .reading {
+      background: #0a0b14;
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .reading-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 2px;
+    }
+
+    .reading-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+    }
+
+    .reading.alpha .reading-label { color: #fbbf24; }
+    .reading.alpha .reading-value { color: #fcd34d; }
+    .reading.beta .reading-label { color: #4ade80; }
+    .reading.beta .reading-value { color: #86efac; }
+    .reading.gamma .reading-label { color: #60a5fa; }
+    .reading.gamma .reading-value { color: #93c5fd; }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 4px 0 10px;
+      font-size: 0.8rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #475569;
+      transition: background 0.2s;
+    }
+
+    .status-dot.active {
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    }
+
+    .status-text {
+      color: var(--text-dim);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.15s;
+      touch-action: manipulation;
+      min-width: 116px;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+      box-shadow: 0 4px 14px -2px rgb(99 102 241 / 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 18px -2px rgb(99 102 241 / 0.5);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.975);
+    }
+
+    .btn-secondary {
+      background: #1f2937;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #374151;
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.975);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .unsupported {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.12);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      text-align: left;
+      margin: 12px auto;
+      max-width: 360px;
+      border: 1px solid rgba(248, 113, 113, 0.25);
+    }
+
+    .unsupported strong {
+      display: block;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .help-box {
+      max-width: 380px;
+      margin: 14px auto 0;
+      background: #12141f;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.35;
+    }
+
+    .help-box summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #cbd5e1;
+      outline: none;
+    }
+
+    .help-box pre {
+      background: #0a0b14;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      overflow-x: auto;
+      margin: 6px 0 4px;
+      color: #94a3b8;
+    }
+
+    .help-box code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .sim-panel {
+      width: 100%;
+      max-width: 380px;
+      margin: 16px auto 0;
+      background: #12141f;
+      border-radius: 12px;
+      padding: 12px 14px 14px;
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+
+    .sim-panel.visible {
+      display: block;
+    }
+
+    .sim-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #e0e7ff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sim-badge {
+      font-size: 0.65rem;
+      background: #334155;
+      color: #94a3b8;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .slider-row {
+      margin-bottom: 9px;
+    }
+
+    .slider-row label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 3px;
+    }
+
+    .slider-row label .sval {
+      font-variant-numeric: tabular-nums;
+      color: #e0e7ff;
+      font-weight: 700;
+    }
+
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: #6366f1;
+      height: 6px;
+    }
+
+    .sim-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sim-actions button {
+      padding: 6px 11px;
+      font-size: 0.78rem;
+      min-width: auto;
+    }
+
+    .file-warning {
+      background: #3f1f1f;
+      color: #fda4af;
+      border: 1px solid #f87171;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin: 10px auto;
+      max-width: 380px;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 380px) {
+      .header h1 { font-size: 1.2rem; }
+      button { min-width: 102px; padding: 10px 16px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Phone 3-Axis Rotation</h1>
+    <p>Tilt and rotate your device.<br>The square responds on X, Y, and Z axes.</p>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="square" id="square">
+      <!-- FRONT -->
+      <div class="face front">
+        <div>
+          <div class="face-label">FRONT</div>
+          <div class="face-main">3D</div>
+        </div>
+        <!-- Local axes indicators (rotate with the square) -->
+        <div class="axis x-axis" title="X axis (local)"></div>
+        <div class="axis y-axis" title="Y axis (local)"></div>
+        <div class="z-dot" title="Z axis indicator">Z</div>
+      </div>
+
+      <!-- BACK -->
+      <div class="face back">
+        <div>
+          <div class="face-label">BACK</div>
+          <div class="face-main">3D</div>
+        </div>
+        <div class="axis x-axis" title="X axis (local)"></div>
+        <div class="axis y-axis" title="Y axis (local)"></div>
+        <div class="z-dot" title="Z axis indicator">Z</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="readings">
+    <div class="readings-header">Current orientation values</div>
+    <div class="readings-grid">
+      <div class="reading alpha">
+        <div class="reading-label">ALPHA (Z)</div>
+        <div class="reading-value" id="val-alpha">—</div>
+      </div>
+      <div class="reading beta">
+        <div class="reading-label">BETA (X)</div>
+        <div class="reading-value" id="val-beta">—</div>
+      </div>
+      <div class="reading gamma">
+        <div class="reading-label">GAMMA (Y)</div>
+        <div class="reading-value" id="val-gamma">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    <div class="status-dot" id="status-dot"></div>
+    <span class="status-text" id="status-text">Sensors inactive</span>
+  </div>
+
+  <div class="controls">
+    <button id="enable-btn" class="btn-primary">Request Sensor Permissions</button>
+    <button id="calibrate-btn" class="btn-secondary" disabled>Calibrate</button>
+    <button id="reset-btn" class="btn-secondary">Reset</button>
+    <button id="sim-toggle-btn" class="btn-secondary">Simulate (sliders)</button>
+  </div>
+
+  <!-- Simulation panel (always available for testing / when sensors blocked) -->
+  <div class="sim-panel" id="sim-panel">
+    <div class="sim-title">
+      Simulation Mode
+      <span class="sim-badge">no hardware needed</span>
+    </div>
+    <div class="slider-row">
+      <label>Alpha — Z (compass/rotate in plane) <span class="sval" id="sval-alpha">0</span>°</label>
+      <input type="range" id="sim-alpha" min="0" max="360" step="0.5" value="0">
+    </div>
+    <div class="slider-row">
+      <label>Beta — X (tilt forward/back) <span class="sval" id="sval-beta">0</span>°</label>
+      <input type="range" id="sim-beta" min="-180" max="180" step="0.5" value="0">
+    </div>
+    <div class="slider-row">
+      <label>Gamma — Y (tilt left/right) <span class="sval" id="sval-gamma">0</span>°</label>
+      <input type="range" id="sim-gamma" min="-90" max="90" step="0.5" value="0">
+    </div>
+    <div class="sim-actions">
+      <button type="button" id="sim-reset" class="btn-secondary">Reset to zero pose</button>
+      <button type="button" id="sim-hide" class="btn-secondary">Hide panel</button>
+    </div>
+    <div style="margin-top:8px;font-size:0.7rem;color:#64748b;">
+      Drag sliders — the square updates instantly. Great for testing the 3D transform even without a phone.
+    </div>
+  </div>
+
+  <div class="help-box">
+    <details>
+      <summary><strong>How to make real sensors work on your phone</strong></summary>
+      <div style="margin-top:8px;">
+        The main button is labeled <strong>“Request Sensor Permissions”</strong>. Tap it (must be a user gesture).<br><br>
+        <strong>Most common cause of “Sensors not available” or no prompt:</strong> loading the raw <code>.html</code> file directly (<code>file://</code>).<br>
+        Browsers disable motion &amp; orientation sensors on direct file access.
+        <br><br>
+        <strong>Quick fix:</strong>
+        <pre>cd /path/to/this/folder
+python3 -m http.server 8000</pre>
+        On your phone (same Wi-Fi) visit <code>http://&lt;your-mac-ip&gt;:8000</code>.<br>
+        Find your IP with <code>ipconfig getifaddr en0</code> (or en1, etc.).<br><br>
+        Alternatives: <code>npx serve .</code> or <code>php -S 0.0.0.0:8000</code>.<br>
+        Use Safari or Chrome on the phone. Tap the button and allow the “motion &amp; orientation” prompt when it appears.<br><br>
+        <em>Tip: This implementation requests permission via both DeviceMotionEvent and DeviceOrientationEvent (following current real-world examples like accelerometerdemo.netlify.app), then listens for deviceorientation events. HTTPS helps on some iOS setups; same-network HTTP usually suffices for testing.</em>
+      </div>
+    </details>
+  </div>
+
+  <script>
+    (function () {
+      const square = document.getElementById('square');
+      const valAlpha = document.getElementById('val-alpha');
+      const valBeta = document.getElementById('val-beta');
+      const valGamma = document.getElementById('val-gamma');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const enableBtn = document.getElementById('enable-btn');
+      const calibrateBtn = document.getElementById('calibrate-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const simToggleBtn = document.getElementById('sim-toggle-btn');
+      const simPanel = document.getElementById('sim-panel');
+      const simAlpha = document.getElementById('sim-alpha');
+      const simBeta = document.getElementById('sim-beta');
+      const simGamma = document.getElementById('sim-gamma');
+      const svalAlpha = document.getElementById('sval-alpha');
+      const svalBeta = document.getElementById('sval-beta');
+      const svalGamma = document.getElementById('sval-gamma');
+      const simResetBtn = document.getElementById('sim-reset');
+      const simHideBtn = document.getElementById('sim-hide');
+
+      let enabled = false;
+      let last = { alpha: 0, beta: 0, gamma: 0 };
+      let offsets = { alpha: 0, beta: 0, gamma: 0 };
+      let simActive = false;
+
+      function setStatus(active, message) {
+        if (active) {
+          statusDot.classList.add('active');
+          statusText.textContent = message || 'Sensors active';
+        } else {
+          statusDot.classList.remove('active');
+          statusText.textContent = message || 'Sensors inactive';
+        }
+      }
+
+      function updateValues(alpha, beta, gamma, isSimulated) {
+        const suffix = isSimulated ? ' (sim)' : '';
+        valAlpha.textContent = alpha.toFixed(1) + '°' + suffix;
+        valBeta.textContent = beta.toFixed(1) + '°' + suffix;
+        valGamma.textContent = gamma.toFixed(1) + '°' + suffix;
+      }
+
+      function applyTransform(alpha, beta, gamma) {
+        // Apply offsets so calibration can zero the current pose
+        const rx = beta - offsets.beta;
+        const ry = gamma - offsets.gamma;
+        const rz = alpha - offsets.alpha;
+
+        // Direct 3-axis mapping:
+        // rotateX() ~ beta (forward/back tilt)
+        // rotateY() ~ gamma (left/right tilt)
+        // rotateZ() ~ alpha (in-plane rotation / compass)
+        square.style.transform =
+          `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+      }
+
+      function setSimulatedValues(alpha, beta, gamma) {
+        simActive = true;
+        last = { alpha, beta, gamma };
+        // Show sim values in the main panel
+        updateValues(alpha, beta, gamma, true);
+        applyTransform(alpha, beta, gamma);
+        // Keep slider displays in sync
+        if (simAlpha) simAlpha.value = alpha;
+        if (svalAlpha) svalAlpha.textContent = alpha.toFixed(1);
+        if (simBeta) simBeta.value = beta;
+        if (svalBeta) svalBeta.textContent = beta.toFixed(1);
+        if (simGamma) simGamma.value = gamma;
+        if (svalGamma) svalGamma.textContent = gamma.toFixed(1);
+
+        // Allow calibrate while in sim mode too (zero the current slider pose)
+        if (calibrateBtn) calibrateBtn.disabled = false;
+      }
+
+      function showSimPanel() {
+        if (simPanel) simPanel.classList.add('visible');
+        if (simToggleBtn) simToggleBtn.textContent = 'Hide sliders';
+        // Seed sliders with current last values (or 0)
+        if (simAlpha && svalAlpha) {
+          simAlpha.value = last.alpha;
+          svalAlpha.textContent = last.alpha.toFixed(1);
+        }
+        if (simBeta && svalBeta) {
+          simBeta.value = last.beta;
+          svalBeta.textContent = last.beta.toFixed(1);
+        }
+        if (simGamma && svalGamma) {
+          simGamma.value = last.gamma;
+          svalGamma.textContent = last.gamma.toFixed(1);
+        }
+        // Immediately drive the square with current slider values
+        applyCurrentSliders();
+      }
+
+      function hideSimPanel() {
+        if (simPanel) simPanel.classList.remove('visible');
+        if (simToggleBtn) simToggleBtn.textContent = 'Simulate (sliders)';
+        simActive = false;
+      }
+
+      function applyCurrentSliders() {
+        const a = parseFloat(simAlpha ? simAlpha.value : 0);
+        const b = parseFloat(simBeta ? simBeta.value : 0);
+        const g = parseFloat(simGamma ? simGamma.value : 0);
+        setSimulatedValues(a, b, g);
+      }
+
+      function handleOrientation(event) {
+        if (!event) return;
+        if (simActive) return; // user is actively using simulation sliders — don't override
+
+        const alpha = event.alpha != null ? event.alpha : 0;
+        const beta = event.beta != null ? event.beta : 0;
+        const gamma = event.gamma != null ? event.gamma : 0;
+
+        last = { alpha, beta, gamma };
+        updateValues(alpha, beta, gamma, false);
+        applyTransform(alpha, beta, gamma);
+      }
+
+      function addOrientationListener() {
+        // Use 'deviceorientation' (works on iOS Safari + Android Chrome)
+        // 'deviceorientationabsolute' exists on some browsers but is less universal.
+        window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+      }
+
+      function enableSensors() {
+        if (enabled) return;
+
+        const isFile = location.protocol === 'file:';
+        if (isFile) {
+          const msg = 'This page was loaded from a local file (file://).\n\n' +
+                      'Browsers block gyroscope and motion sensors on file:// for security.\n\n' +
+                      'Serve it over HTTP instead (see the help box below) and reload.';
+          alert(msg);
+          showSimPanel();
+          return;
+        }
+
+        const DM = window.DeviceMotionEvent;
+        const DO = window.DeviceOrientationEvent;
+
+        // Collect permission requests from whichever APIs expose requestPermission.
+        // This follows current real-world implementations (vendors deviate from spec).
+        // The provided working reference (accelerometerdemo.netlify.app) uses DeviceMotionEvent.requestPermission()
+        // and then listens for deviceorientation events.
+        const permissionPromises = [];
+
+        if (DM && typeof DM.requestPermission === 'function') {
+          permissionPromises.push(DM.requestPermission());
+        }
+        if (DO && typeof DO.requestPermission === 'function') {
+          permissionPromises.push(DO.requestPermission());
+        }
+
+        if (permissionPromises.length > 0) {
+          // iOS 13+ path (Safari + Chrome on iOS). Must be called from user gesture.
+          Promise.all(permissionPromises)
+            .then(function (results) {
+              // Grant if at least one permission was granted (some impls use one prompt for both).
+              const anyGranted = results.some(function (r) { return r === 'granted'; });
+              if (anyGranted || results.length === 0) {
+                addOrientationListener();
+                enabled = true;
+                simActive = false;
+                if (simPanel) simPanel.classList.remove('visible');
+                setStatus(true, 'Sensors active — tilt & rotate your phone');
+                if (enableBtn) {
+                  enableBtn.disabled = true;
+                  enableBtn.textContent = 'Permissions Granted';
+                }
+                if (calibrateBtn) calibrateBtn.disabled = false;
+                if (simToggleBtn) simToggleBtn.textContent = 'Simulate (sliders)';
+              } else {
+                alert('Permission was denied.\nYou can still use the simulation sliders below, or try tapping the button again after reloading.');
+                showSimPanel();
+              }
+            })
+            .catch(function (err) {
+              console.error('[sensor permission]', err);
+              alert('Error requesting sensor permission: ' + err + '\n\nSimulation mode is available below.');
+              showSimPanel();
+            });
+        } else {
+          // Non-iOS / no permission API needed (most Android Chrome, desktop DevTools simulation, older browsers).
+          // Just attach the listener; events will fire if hardware is present.
+          addOrientationListener();
+          enabled = true;
+          simActive = false;
+          if (simPanel) simPanel.classList.remove('visible');
+          setStatus(true, 'Sensors active — tilt & rotate your device');
+          if (enableBtn) {
+            enableBtn.disabled = true;
+            enableBtn.textContent = 'Permissions Granted';
+          }
+          if (calibrateBtn) calibrateBtn.disabled = false;
+          if (simToggleBtn) simToggleBtn.textContent = 'Simulate (sliders)';
+        }
+      }
+
+      function calibrate() {
+        // Works for both real sensors (when enabled) and simulation mode.
+        // Sets the *current* pose as the new "zero" for the square (visual becomes flat/identity).
+        offsets.alpha = last.alpha;
+        offsets.beta = last.beta;
+        offsets.gamma = last.gamma;
+
+        // Re-apply using current last values (square snaps to no extra rotation)
+        applyTransform(last.alpha, last.beta, last.gamma);
+      }
+
+      function resetOffsets() {
+        offsets = { alpha: 0, beta: 0, gamma: 0 };
+        if (enabled && last && !simActive) {
+          applyTransform(last.alpha, last.beta, last.gamma);
+        } else if (simActive) {
+          // In sim mode: reset both offsets *and* the sliders/visual to 0
+          if (simAlpha) simAlpha.value = 0;
+          if (simBeta) simBeta.value = 0;
+          if (simGamma) simGamma.value = 0;
+          if (svalAlpha) svalAlpha.textContent = '0';
+          if (svalBeta) svalBeta.textContent = '0';
+          if (svalGamma) svalGamma.textContent = '0';
+          last = { alpha: 0, beta: 0, gamma: 0 };
+          applyTransform(0, 0, 0);
+          updateValues(0, 0, 0, true);
+        } else {
+          // Reset visual to identity
+          square.style.transform = 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
+        }
+      }
+
+      // Button wiring
+      enableBtn.addEventListener('click', enableSensors);
+      calibrateBtn.addEventListener('click', calibrate);
+      resetBtn.addEventListener('click', resetOffsets);
+
+      // Simulation controls
+      if (simToggleBtn) {
+        simToggleBtn.addEventListener('click', function () {
+          if (simPanel && simPanel.classList.contains('visible')) {
+            hideSimPanel();
+          } else {
+            showSimPanel();
+          }
+        });
+      }
+      if (simResetBtn) {
+        simResetBtn.addEventListener('click', function () {
+          if (simAlpha) simAlpha.value = 0;
+          if (simBeta) simBeta.value = 0;
+          if (simGamma) simGamma.value = 0;
+          applyCurrentSliders();
+        });
+      }
+      if (simHideBtn) {
+        simHideBtn.addEventListener('click', hideSimPanel);
+      }
+
+      // Live slider listeners — update square immediately
+      function wireSlider(slider, svalEl) {
+        if (!slider || !svalEl) return;
+        slider.addEventListener('input', function () {
+          svalEl.textContent = parseFloat(slider.value).toFixed(1);
+          applyCurrentSliders();
+        });
+        // Also on change for older browsers / touch
+        slider.addEventListener('change', function () {
+          svalEl.textContent = parseFloat(slider.value).toFixed(1);
+          applyCurrentSliders();
+        });
+      }
+      wireSlider(simAlpha, svalAlpha);
+      wireSlider(simBeta, svalBeta);
+      wireSlider(simGamma, svalGamma);
+
+      // Initial state
+      setStatus(false);
+      updateValues(0, 0, 0, false);
+      // Start with a nice 3D pose so the perspective, faces, and axis lines are obvious immediately
+      square.style.transform = 'rotateX(-22deg) rotateY(31deg) rotateZ(6deg)';
+
+      // If we auto-show simulation later, the sliders will take over.
+
+      // ===== Proactive support / environment detection =====
+      const hasMotion = typeof window.DeviceMotionEvent !== 'undefined' && window.DeviceMotionEvent !== null;
+      const hasOrientation = typeof window.DeviceOrientationEvent !== 'undefined' && window.DeviceOrientationEvent !== null;
+      const hasSensorAPIs = hasMotion || hasOrientation;
+      const isFile = location.protocol === 'file:';
+      const isSecure = !!(window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '[::1]');
+
+      if (!hasSensorAPIs || isFile) {
+        let msgHTML = '';
+        if (isFile) {
+          msgHTML = '<strong>Opened via file:// — sensors blocked by the browser.</strong><br>' +
+                    'Gyroscope / motion sensors are disabled on direct file:// access (security policy).<br>' +
+                    'Use a local web server (see instructions in the box below) and reload from <code>http://your-ip:port</code>.';
+        } else {
+          msgHTML = 'No DeviceMotionEvent or DeviceOrientationEvent API detected.<br>' +
+                    'This demo needs a modern mobile browser on a physical device with a gyroscope/accelerometer.';
+        }
+
+        const note = document.createElement('div');
+        note.className = 'unsupported';
+        note.innerHTML = msgHTML;
+        const target = document.querySelector('.help-box') || document.querySelector('.controls');
+        if (target && target.parentNode) {
+          target.parentNode.insertBefore(note, target);
+        }
+
+        if (isFile && enableBtn) {
+          enableBtn.textContent = 'Serve over HTTP first';
+          // Leave button enabled so the click handler can still show a helpful alert + sim
+        }
+        // For completely missing APIs (rare on real mobile Safari/Chrome when served over http),
+        // we still leave the button enabled — the click handler will guide the user.
+        // Auto-offer simulation so the 3D demo is immediately usable.
+        if (!hasSensorAPIs || isFile) {
+          setTimeout(function () {
+            if (simPanel && !simPanel.classList.contains('visible')) {
+              last = { alpha: 6, beta: -22, gamma: 31 };
+              showSimPanel();
+            }
+          }, 80);
+        }
+      }
+
+      // Optional: allow clicking the square to calibrate (nice for touch)
+      // In simulation mode this fully resets sliders + offsets to a flat zero pose.
+      square.addEventListener('click', function () {
+        if (simActive) {
+          resetOffsets();
+        } else if (enabled) {
+          calibrate();
+        }
+      });
+
+      // Keyboard support for desktop testing (c = calibrate current pose, r = reset to absolute 0, s = toggle sim)
+      document.addEventListener('keydown', function (e) {
+        const k = e.key.toLowerCase();
+        if (k === 'c' && (enabled || simActive)) calibrate();
+        if (k === 'r') resetOffsets();
+        if (k === 's') {
+          if (simPanel && simPanel.classList.contains('visible')) hideSimPanel();
+          else showSimPanel();
+        }
+      });
+
+      // Friendly console message + diagnostics
+      console.log('%c[3-Axis Demo] Static HTML ready. Protocol: ' + location.protocol + ' | hasMotion: ' + hasMotion + ' | hasOrientation: ' + hasOrientation + ' | secure: ' + isSecure, 'color:#64748b');
+      console.log('%cTip: On desktop Chrome use DevTools → Sensors → Orientation (or Motion). Press S to toggle sliders. Request uses DeviceMotionEvent + DeviceOrientationEvent.requestPermission when present.', 'color:#64748b');
+    })();
+  </script>
+</body>
+</html>

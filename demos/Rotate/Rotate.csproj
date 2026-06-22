@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Web4.WebSocket/Web4.WebSocket.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <LangVersion>preview</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+</Project>
