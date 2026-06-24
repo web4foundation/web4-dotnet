@@ -5,19 +5,6 @@ using Web4.Dom;
 using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureKestrel((context, options) =>
-{
-  options.ListenAnyIP(443, listenOptions =>
-  {
-      var certificate = X509Certificate2.CreateFromPemFile(
-          certPemFilePath: "/etc/letsencrypt/live/xtml.dev/fullchain.pem",
-          keyPemFilePath: "/etc/letsencrypt/live/xtml.dev/privkey.pem"
-      );
-
-      listenOptions.UseHttps(certificate);
-  });
-});
-
 var app = builder.Build();
 
 var alpha = 0;
