@@ -388,8 +388,8 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
         Writer.Write("""
 
                 <!-- Injected by Web4 -->
-                <script src="/_web4/web4.js" defer></script>
-                <link href="/_web4/web4.css" rel="stylesheet" />
+                <script src="/_app/websocket/kernel" defer></script>
+                <link href="/_app/base/ui" rel="stylesheet" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
                 <meta charset="UTF-8">
 

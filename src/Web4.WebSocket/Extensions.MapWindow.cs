@@ -39,7 +39,7 @@ public static partial class Extensions
             await httpContext.WriteAsync(composer, window.Template);
         });
 
-        group.Map("/web4", async httpContext =>
+        group.Map("/app", async httpContext =>
         {
             if (httpContext.WebSockets.IsWebSocketRequest)
             {
@@ -58,19 +58,19 @@ public static partial class Extensions
             applicationBuilder.Properties["IS_WEB4_MAPPED"] = true;
 
             // TODO: Support gz and br
-            app.Map("/_web4/web4.js", (HttpContext context) =>
+            app.Map("/_app/websocket/kernel", (HttpContext context) =>
             {
                 context.Response.ContentType = "text/javascript";
                 context.Response.ContentLength = AssetsHelper.WEB4_JS.Length;
                 context.Response.BodyWriter.Write(AssetsHelper.WEB4_JS);
             });
-            app.Map("/_web4/web4.css", (HttpContext context) =>
+            app.Map("/_app/base/ui", (HttpContext context) =>
             {
                 context.Response.ContentType = "text/css";
                 context.Response.ContentLength = AssetsHelper.WEB4_CSS.Length;
                 context.Response.BodyWriter.Write(AssetsHelper.WEB4_CSS);
             });
-            app.Map("/_web4/alive", async httpContext =>
+            app.Map("/_app/alive", async httpContext =>
             {
                 if (httpContext.WebSockets.IsWebSocketRequest)
                     await httpContext.WebSockets.AcceptWebSocketAsync();
