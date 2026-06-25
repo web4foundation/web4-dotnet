@@ -57,19 +57,12 @@ public static partial class Extensions
         {
             applicationBuilder.Properties["IS_WEB4_MAPPED"] = true;
 
-            // TODO: Support gz and br
             app.Map("/_app/websocket/kernel", (HttpContext context) =>
-            {
-                context.Response.ContentType = "text/javascript";
-                context.Response.ContentLength = AssetsHelper.WEB4_JS.Length;
-                context.Response.BodyWriter.Write(AssetsHelper.WEB4_JS);
-            });
+                WriteAsset(context, "text/javascript", AssetsHelper.GetWeb4Js(context.Request.Headers.AcceptEncoding.ToString())));
+
             app.Map("/_app/base/ui", (HttpContext context) =>
-            {
-                context.Response.ContentType = "text/css";
-                context.Response.ContentLength = AssetsHelper.WEB4_CSS.Length;
-                context.Response.BodyWriter.Write(AssetsHelper.WEB4_CSS);
-            });
+                WriteAsset(context, "text/css", AssetsHelper.GetWeb4Css(context.Request.Headers.AcceptEncoding.ToString())));
+
             app.Map("/_app/alive", async httpContext =>
             {
                 if (httpContext.WebSockets.IsWebSocketRequest)
@@ -78,6 +71,16 @@ public static partial class Extensions
         }
 
         return window;
+    }
+
+    private static void WriteAsset(HttpContext context, string contentType, (byte[] Body, string? ContentEncoding) asset)
+    {
+        context.Response.ContentType = contentType;
+        context.Response.Headers.Vary = "Accept-Encoding";
+        if (asset.ContentEncoding is not null)
+            context.Response.Headers.ContentEncoding = asset.ContentEncoding;
+        context.Response.ContentLength = asset.Body.Length;
+        context.Response.BodyWriter.Write(asset.Body);
     }
 
     private static ValueTask<FlushResult> WriteAsync<T>(
