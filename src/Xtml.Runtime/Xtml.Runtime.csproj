@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Xtml.Templating/HtmlString.csproj" />
+    <ProjectReference Include="../Xtml.Templating/Xtml.Templating.csproj" />
     <EmbeddedResource Include="Assets/web4.js" />
     <EmbeddedResource Include="Assets/web4.css" />
     <None Include="README.md" Pack="true" PackagePath="" />

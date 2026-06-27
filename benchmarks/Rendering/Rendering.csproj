@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="../../src/Xtml.WebSocket/Web4.WebSocket.csproj" />
+      <ProjectReference Include="../../src/Xtml.WebSocket/Xtml.WebSocket.csproj" />
     </ItemGroup>
 
 </Project>

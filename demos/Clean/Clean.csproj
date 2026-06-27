@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Xtml.WebSocket/Web4.WebSocket.csproj" />
+    <ProjectReference Include="../../src/Xtml.WebSocket/Xtml.WebSocket.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
