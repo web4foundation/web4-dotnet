@@ -1,7 +1,7 @@
 global using HtmlString;
-global using Web4;
-global using Web4.WebSocket;
-global using Web4.Dom;
+global using Xtml;
+global using Xtml.WebSocket;
+global using Xtml.Dom;
 global using Xtml;
 global using System.Buffers;
 using System.Drawing;

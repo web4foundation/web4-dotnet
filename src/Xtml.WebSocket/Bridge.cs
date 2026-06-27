@@ -7,13 +7,13 @@ using System.Threading.Channels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Keyholes.Composers;
-using Web4.Dom;
-using Web4.WebSocket.Buffers;
+using Xtml.Dom;
+using Xtml.WebSocket.Buffers;
 using Keyholes;
-using Web4.WebSocket.Dom;
+using Xtml.WebSocket.Dom;
 using Keyholes.Utilities;
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder, ILogger logger)
 {

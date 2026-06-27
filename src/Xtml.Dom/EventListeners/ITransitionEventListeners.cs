@@ -1,4 +1,4 @@
-namespace Web4.Dom.EventListeners;
+namespace Xtml.Dom.EventListeners;
 
 public interface ITransitionEventListeners
 {

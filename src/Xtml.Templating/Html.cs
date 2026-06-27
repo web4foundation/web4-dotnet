@@ -2,7 +2,7 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HtmlString.Composers;
-using Web4.Dom;
+using Xtml.Dom;
 
 namespace HtmlString;
 

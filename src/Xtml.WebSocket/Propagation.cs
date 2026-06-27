@@ -1,4 +1,4 @@
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public class Propagation
 {

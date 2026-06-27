@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using HtmlString;
 using HtmlString.Composers;
-using Web4.Composers;
+using Xtml.Composers;
 using Keyholes;
 using Keyholes.Composers;
 

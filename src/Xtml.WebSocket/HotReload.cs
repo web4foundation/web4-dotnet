@@ -1,6 +1,6 @@
 #if !DEBUG
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public static class HotReload
 {
@@ -17,9 +17,9 @@ public static class HotReload
 using System.Diagnostics;
 using System.Reflection.Metadata;
 
-[assembly: MetadataUpdateHandler(typeof(Web4.WebSocket.HotReload))]
+[assembly: MetadataUpdateHandler(typeof(Xtml.WebSocket.HotReload))]
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public static class HotReload
 {

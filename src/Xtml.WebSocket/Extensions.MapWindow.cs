@@ -11,7 +11,7 @@ using HtmlString;
 using HtmlString.Composers;
 using Keyholes.Assets;
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public static partial class Extensions
 {

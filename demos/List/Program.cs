@@ -1,4 +1,4 @@
-global using Web4.WebSocket;
+global using Xtml.WebSocket;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();

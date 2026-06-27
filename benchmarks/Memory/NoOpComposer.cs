@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using HtmlString;
 using HtmlString.Composers;
 
-namespace Web4.Composers;
+namespace Xtml.Composers;
 
 public sealed class NoOpComposer : BaseComposer
 {

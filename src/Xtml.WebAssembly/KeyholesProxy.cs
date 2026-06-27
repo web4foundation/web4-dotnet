@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices.JavaScript;
 
-namespace Web4.WebAssembly;
+namespace Xtml.WebAssembly;
 
 public partial class KeyholesProxy
 {

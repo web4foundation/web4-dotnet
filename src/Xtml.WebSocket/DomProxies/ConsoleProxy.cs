@@ -1,6 +1,6 @@
-using Web4.Dom;
+using Xtml.Dom;
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 // Instead of a new-ing up another class, save an instantiation 
 // and explicitly implement on Bridge.

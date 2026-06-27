@@ -1,4 +1,4 @@
-namespace Web4.WebSocket.Buffers;
+namespace Xtml.WebSocket.Buffers;
 
 partial class JsonRpcWriter
 {

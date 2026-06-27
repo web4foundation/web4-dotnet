@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Text;
 
-namespace Web4.Composers;
+namespace Xtml.Composers;
 
 public class NoOpWriter : IBufferWriter<byte>
 {

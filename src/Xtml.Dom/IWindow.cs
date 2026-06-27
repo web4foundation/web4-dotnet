@@ -1,4 +1,4 @@
-namespace Web4.Dom;
+namespace Xtml.Dom;
 
 public interface IWindow
 {

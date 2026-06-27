@@ -1,4 +1,4 @@
-namespace Web4.WebAssembly;
+namespace Xtml.WebAssembly;
 
 // public class Bridge
 // {

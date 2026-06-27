@@ -1,6 +1,6 @@
 using System.Buffers;
 
-namespace Web4.WebSocket.Buffers;
+namespace Xtml.WebSocket.Buffers;
 
 public class PooledSequenceBufferWriter<T> : IBufferWriter<T>
 {

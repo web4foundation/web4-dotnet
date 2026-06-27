@@ -1,4 +1,4 @@
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 /// <summary>
 /// Calculating diffs requires two snapshots - a "before" and an "after."

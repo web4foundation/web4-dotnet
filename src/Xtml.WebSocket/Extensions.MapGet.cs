@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using HtmlString;
 using Keyholes.Composers;
 
-namespace Web4.WebSocket;
+namespace Xtml.WebSocket;
 
 public static partial class Extensions
 {

@@ -1,4 +1,4 @@
-namespace Web4;
+namespace Xtml;
 
 public interface IRenderable
 {

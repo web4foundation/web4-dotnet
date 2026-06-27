@@ -1,6 +1,6 @@
-using static Web4.Dom.Events.Aliases.Subsets;
+using static Xtml.Dom.Events.Aliases.Subsets;
 
-namespace Web4.Dom.Events.Subsets;
+namespace Xtml.Dom.Events.Subsets;
 
 public interface IModifiersSubset : ISubset, ModifierAlt, ModifierCtrl, ModifierMeta, ModifierShift, IViewSubset
 {

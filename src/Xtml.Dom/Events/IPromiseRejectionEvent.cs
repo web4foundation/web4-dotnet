@@ -1,4 +1,4 @@
-namespace Web4.Dom.Events;
+namespace Xtml.Dom.Events;
 
 // TODO: Implement
 public interface IPromiseRejectionEvent

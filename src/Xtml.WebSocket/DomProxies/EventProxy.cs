@@ -3,12 +3,12 @@ using System.Buffers;
 using System.Drawing;
 using System.Text.Json;
 using Microsoft.Extensions.ObjectPool;
-using Web4.Dom;
-using Web4.Dom.Events;
-using Web4.Dom.Events.Subsets;
-using Web4.WebSocket.Buffers;
+using Xtml.Dom;
+using Xtml.Dom.Events;
+using Xtml.Dom.Events.Subsets;
+using Xtml.WebSocket.Buffers;
 
-namespace Web4.WebSocket.Dom;
+namespace Xtml.WebSocket.Dom;
 
 /// <summary>
 /// A WebSocket-optimized implementation of the Event interface.
@@ -376,7 +376,7 @@ public record struct EventProxy : Event, IDisposable
     bool IEvent.Bubbles => Bubbles ?? default;
 
     public Button? Button => GetInt("button") switch { int v => (Button)v, _ => null };
-    Button IButtonsSubset.Button => Button ?? Web4.Dom.Events.Button.Main;
+    Button IButtonsSubset.Button => Button ?? Xtml.Dom.Events.Button.Main;
 
     public ButtonFlag? Buttons => GetInt("button") switch { int v => (ButtonFlag)v, _ => null };
     ButtonFlag IButtonsSubset.Buttons => Buttons ?? ButtonFlag.None;
@@ -418,7 +418,7 @@ public record struct EventProxy : Event, IDisposable
     bool IEvent.DefaultPrevented => DefaultPrevented ?? default;
 
     public DeltaMode? DeltaMode => GetInt("deltaMode") switch { int v => (DeltaMode)v, _ => null };
-    DeltaMode IDeltasSubset.DeltaMode => DeltaMode ?? Web4.Dom.Events.DeltaMode.Pixel;
+    DeltaMode IDeltasSubset.DeltaMode => DeltaMode ?? Xtml.Dom.Events.DeltaMode.Pixel;
 
     public double? DeltaX => GetDouble("deltaX");
     double IDeltasSubset.DeltaX => DeltaX ?? default;
@@ -439,7 +439,7 @@ public record struct EventProxy : Event, IDisposable
     DOMException IErrorSubset.Error => Error ?? DOMException.Empty;
 
     public EventPhase? EventPhase => GetInt("eventPhase") switch { int v => (EventPhase)v, _ => null };
-    EventPhase IEvent.EventPhase => EventPhase ?? Web4.Dom.Events.EventPhase.None;
+    EventPhase IEvent.EventPhase => EventPhase ?? Xtml.Dom.Events.EventPhase.None;
 
     public string? FileName => GetReference("fileName") as string;
     string IErrorSubset.FileName => FileName ?? string.Empty;

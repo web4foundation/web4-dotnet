@@ -3,7 +3,7 @@ using System.Threading.Channels;
 using Keyholes;
 using Keyholes.Utilities;
 
-namespace Web4.WebSocket.Buffers;
+namespace Xtml.WebSocket.Buffers;
 
 partial class JsonRpcWriter
 {

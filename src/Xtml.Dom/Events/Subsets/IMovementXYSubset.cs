@@ -1,4 +1,4 @@
-namespace Web4.Dom.Events.Subsets;
+namespace Xtml.Dom.Events.Subsets;
 
 public interface IMovementXYSubset : ISubset, IViewSubset
 {
