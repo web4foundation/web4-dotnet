@@ -39,7 +39,7 @@ public static partial class Extensions
             await httpContext.WriteAsync(composer, window.Template);
         });
 
-        group.Map("/app", async httpContext =>
+        group.Map("/ui.ws", async httpContext =>
         {
             if (httpContext.WebSockets.IsWebSocketRequest)
             {
@@ -57,10 +57,10 @@ public static partial class Extensions
         {
             applicationBuilder.Properties["IS_WEB4_MAPPED"] = true;
 
-            app.Map("/_app/websocket/kernel", (HttpContext context) =>
+            app.Map("/_app/websocket/ui.js", (HttpContext context) =>
                 WriteAsset(context, "text/javascript", AssetsHelper.GetWeb4Js(context.Request.Headers.AcceptEncoding.ToString())));
 
-            app.Map("/_app/base/ui", (HttpContext context) =>
+            app.Map("/_app/base/ui.css", (HttpContext context) =>
                 WriteAsset(context, "text/css", AssetsHelper.GetWeb4Css(context.Request.Headers.AcceptEncoding.ToString())));
 
             app.Map("/_app/alive", async httpContext =>

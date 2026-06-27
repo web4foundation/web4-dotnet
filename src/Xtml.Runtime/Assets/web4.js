@@ -180,7 +180,7 @@ class Web4Keyhole {
 }
 
 class WebSocketBridge {
-  #webSocket = new WebSocket(location.pathname.endsWith('/') ? `app` : `${location.pathname}/app`);
+  #webSocket = new WebSocket(location.pathname.endsWith('/') ? `ui.ws` : `${location.pathname}/ui.ws`);
   #messageID = 0;
   #reconnectionAttempts = 0;
   #promises = new Map();
