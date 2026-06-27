@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace HtmlString;
+namespace Xtml.Templating;
 
 public static partial class Extensions
 {

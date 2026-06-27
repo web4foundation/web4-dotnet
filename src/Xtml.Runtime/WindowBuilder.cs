@@ -3,7 +3,7 @@ using System.Drawing;
 using Xtml.Dom.EventListeners;
 using Keyholes.Composers;
 using Xtml.Dom;
-using HtmlString;
+using Xtml.Templating;
 using Keyholes.Utilities;
 
 namespace Keyholes;

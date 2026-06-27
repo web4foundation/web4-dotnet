@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Routing;
-using HtmlString;
+using Xtml.Templating;
 using Keyholes.Composers;
 
 namespace Xtml.WebSocket;

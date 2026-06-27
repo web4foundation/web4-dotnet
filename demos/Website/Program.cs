@@ -1,4 +1,4 @@
-global using HtmlString;
+global using Xtml.Templating;
 global using Xtml;
 global using Xtml.WebSocket;
 global using Xtml.Dom;

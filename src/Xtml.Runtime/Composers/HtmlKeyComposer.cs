@@ -1,8 +1,8 @@
 using System.Buffers;
 using System.Drawing;
 using System.Text;
-using HtmlString;
-using HtmlString.Composers;
+using Xtml.Templating;
+using Xtml.Templating.Composers;
 using Xtml.Dom;
 using Keyholes.Utilities;
 

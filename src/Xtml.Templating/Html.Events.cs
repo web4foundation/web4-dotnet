@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Xtml.Dom;
 using Xtml.Dom.Events.Subsets;
 
-namespace HtmlString;
+namespace Xtml.Templating;
 
 public ref partial struct Html
 {

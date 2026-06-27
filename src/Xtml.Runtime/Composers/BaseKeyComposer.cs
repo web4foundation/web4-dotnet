@@ -1,6 +1,6 @@
 using System.Drawing;
-using HtmlString;
-using HtmlString.Composers;
+using Xtml.Templating;
+using Xtml.Templating.Composers;
 using Xtml.Dom;
 
 namespace Keyholes.Composers;

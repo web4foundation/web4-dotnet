@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using HtmlString;
+using Xtml.Templating;
 using Xtml.Dom;
 
 namespace Keyholes.Composers;

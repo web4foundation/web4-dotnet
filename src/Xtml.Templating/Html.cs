@@ -1,10 +1,10 @@
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using HtmlString.Composers;
+using Xtml.Templating.Composers;
 using Xtml.Dom;
 
-namespace HtmlString;
+namespace Xtml.Templating;
 
 public enum HtmlType { Default, Template, Wrapper }
 

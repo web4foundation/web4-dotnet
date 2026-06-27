@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Keyholes;
 using System.Diagnostics;
 using System.IO.Pipelines;
-using HtmlString;
-using HtmlString.Composers;
+using Xtml.Templating;
+using Xtml.Templating.Composers;
 using Keyholes.Assets;
 
 namespace Xtml.WebSocket;

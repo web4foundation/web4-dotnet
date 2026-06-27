@@ -1,7 +1,7 @@
 using System.Drawing;
 using Xtml.Dom;
 
-namespace HtmlString.Composers;
+namespace Xtml.Templating.Composers;
 
 public abstract class BaseComposer
 {

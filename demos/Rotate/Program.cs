@@ -1,5 +1,5 @@
 using System.Drawing;
-using HtmlString;
+using Xtml.Templating;
 using Xtml.WebSocket;
 using Xtml.Dom;
 using System.Security.Cryptography.X509Certificates;

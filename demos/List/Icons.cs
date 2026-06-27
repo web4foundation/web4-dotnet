@@ -1,4 +1,4 @@
-using HtmlString;
+using Xtml.Templating;
 
 static class Icons
 {

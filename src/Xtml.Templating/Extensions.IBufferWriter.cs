@@ -3,9 +3,9 @@ using System.Drawing;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Text;
-using HtmlString.Composers;
+using Xtml.Templating.Composers;
 
-namespace HtmlString;
+namespace Xtml.Templating;
 
 public static partial class Extensions
 {

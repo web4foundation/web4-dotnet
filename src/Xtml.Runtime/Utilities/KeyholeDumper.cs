@@ -1,6 +1,6 @@
 using System.Text;
 using Xtml.Dom;
-using HtmlString;
+using Xtml.Templating;
 
 namespace Keyholes.Utilities;
 

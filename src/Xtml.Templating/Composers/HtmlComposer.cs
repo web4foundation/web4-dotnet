@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Drawing;
 using Xtml.Dom;
 
-namespace HtmlString.Composers;
+namespace Xtml.Templating.Composers;
 
 public class HtmlComposer(IBufferWriter<byte> writer) : BaseComposer, IStreamingComposer
 {

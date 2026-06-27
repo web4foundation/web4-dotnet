@@ -1,4 +1,4 @@
-using HtmlString;
+using Xtml.Templating;
 using Xtml.WebSocket;
 
 var builder = WebApplication.CreateBuilder(args);

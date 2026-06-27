@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using HtmlString;
-using HtmlString.Composers;
+using Xtml.Templating;
+using Xtml.Templating.Composers;
 
 namespace Xtml.Composers;
 

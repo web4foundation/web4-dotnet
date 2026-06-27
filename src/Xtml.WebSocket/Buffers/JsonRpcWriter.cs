@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Channels;
-using HtmlString;
+using Xtml.Templating;
 using Keyholes;
 
 namespace Xtml.WebSocket.Buffers;
