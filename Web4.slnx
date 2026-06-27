@@ -16,13 +16,12 @@
     <Project Path="demos/Website/Website.csproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/HtmlString/HtmlString.csproj" />
-    <Project Path="src/Keyholes/Keyholes.csproj" />
-    <Project Path="src/Web4.Dom/Web4.Dom.csproj" />
-    <Project Path="src/Web4.Sdk/Web4.Sdk.csproj" />
-    <Project Path="src/Web4.WebAssembly/Web4.WebAssembly.csproj" />
-    <Project Path="src/Web4.WebSocket/Web4.WebSocket.csproj" />
-    <Project Path="src/Xtml/Xtml.csproj" />
+    <Project Path="src/Xtml.Dom/Web4.Dom.csproj" />
+    <Project Path="src/Xtml.Runtime/Keyholes.csproj" />
+    <Project Path="src/Xtml.SourceGenerator/Xtml.csproj" />
+    <Project Path="src/Xtml.Templating/HtmlString.csproj" />
+    <Project Path="src/Xtml.WebAssembly/Web4.WebAssembly.csproj" />
+    <Project Path="src/Xtml.WebSocket/Web4.WebSocket.csproj" />
   </Folder>
   <Folder Name="/tests/" />
 </Solution>

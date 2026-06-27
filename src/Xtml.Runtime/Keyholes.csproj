@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,26 +7,28 @@
     <Version>0.0.1</Version>
     <Authors>Rylan Barnes</Authors>
     <Company>Web4 Foundation</Company>
-    <Product>Web4.Sdk</Product>
-    <Description>The web's SDK for native webapps</Description>
+    <Product>Keyholes</Product>
+    <Description>Keyholes - a common abstraction for bridging into the DOM from WebAssembly or WebSockets</Description>
     <Copyright>Copyright © Rylan Barnes 2026</Copyright>
-    <Summary>The web's SDK for native webapps</Summary>
+    <Summary>Keyholes - a common abstraction for bridging into the DOM from WebAssembly or WebSockets</Summary>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Title>Web4.Sdk</Title>
-    <PackageId>Web4.Sdk</PackageId>
+    <Title>Keyholes</Title>
+    <PackageId>Keyholes</PackageId>
     <PackageVersion>0.0.1</PackageVersion>
     <PackageTags>html;reconciler;reconciliation;diff;diffing;keyholes</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>package-icon.png</PackageIcon>
-    <PackageProjectUrl>https://web4.dev</PackageProjectUrl>
+    <!-- <PackageIcon>packageIcon.png</PackageIcon> -->
+    <PackageProjectUrl>https://web4.dev/keyholes</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/web4foundation/web4-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../Xtml.Templating/HtmlString.csproj" />
+    <EmbeddedResource Include="Assets/web4.js" />
+    <EmbeddedResource Include="Assets/web4.css" />
     <None Include="README.md" Pack="true" PackagePath="" />
-    <None Include="package-icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
-
+  
 </Project>
