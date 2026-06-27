@@ -21,7 +21,7 @@
     <PackageTags>html;xtml</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>package-icon.png</PackageIcon>
-    <PackageProjectUrl>https://web4.dev/xtml</PackageProjectUrl>
+    <PackageProjectUrl>https://xtml.dev</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/web4foundation/web4-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

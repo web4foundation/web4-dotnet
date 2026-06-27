@@ -1,8 +1,8 @@
-class Web4Keyholes {
+class Keyholes {
   #bridge = new WebSocketBridge();
 
   set(key, node, booleanAttributeName) {
-    this[key] = new Web4Keyhole(this.#bridge, key, node);
+    this[key] = new Keyhole(this.#bridge, key, node);
     if (booleanAttributeName)
       this[key].booleanAttributeName = booleanAttributeName;
     else
@@ -35,7 +35,7 @@ class Web4Keyholes {
   }
 }
 
-class Web4Keyhole {
+class Keyhole {
   #bridge;
   key;
   node;
@@ -114,10 +114,10 @@ class Web4Keyhole {
   }
 
   #batchMutation(mutation, invalidatesKeyholes) {
-    Web4Keyhole.#transitionBatch.mutations.push(mutation);
+    Keyhole.#transitionBatch.mutations.push(mutation);
 
     if (invalidatesKeyholes)
-      Web4Keyhole.#transitionBatch.keyholesInvalidated = true;
+      Keyhole.#transitionBatch.keyholesInvalidated = true;
   }
 
   #createNode(rawHtml) {
@@ -129,8 +129,8 @@ class Web4Keyhole {
   }
 
   #prepareNode(node, viewTransitionName) {
-    if (!Web4Keyhole.#transitionBatch.nodes.includes(node))
-      Web4Keyhole.#transitionBatch.nodes.push(node);
+    if (!Keyhole.#transitionBatch.nodes.includes(node))
+      Keyhole.#transitionBatch.nodes.push(node);
 
     if (node.style)
       node.style.viewTransitionName = viewTransitionName.replaceAll(":", "-");
@@ -138,18 +138,18 @@ class Web4Keyhole {
 
   #prepareSiblings() {
     this.node.parentElement.childNodes.forEach((sibling, i) => {
-      if (!Web4Keyhole.#transitionBatch.nodes.includes(sibling))
-        Web4Keyhole.#transitionBatch.nodes.push(sibling);
+      if (!Keyhole.#transitionBatch.nodes.includes(sibling))
+        Keyhole.#transitionBatch.nodes.push(sibling);
       
       if (sibling.style && !sibling.style.viewTransitionName)
-        sibling.style.viewTransitionName = `web4-sibling-${this.key.replaceAll(":", "-")}-${i}`;
+        sibling.style.viewTransitionName = `xtml-sibling-${this.key.replaceAll(":", "-")}-${i}`;
     });
   }
 
   static flushTransitionBatch() {
-    let mutations = Web4Keyhole.#transitionBatch.mutations;
-    let nodes = Web4Keyhole.#transitionBatch.nodes;
-    let keyholesInvalidated = Web4Keyhole.#transitionBatch.keyholesInvalidated;
+    let mutations = Keyhole.#transitionBatch.mutations;
+    let nodes = Keyhole.#transitionBatch.nodes;
+    let keyholesInvalidated = Keyhole.#transitionBatch.keyholesInvalidated;
 
     if (!document.startViewTransition || mutations.length == 0) {
       if (keyholesInvalidated)
@@ -157,23 +157,23 @@ class Web4Keyhole {
       return;
     }
 
-    Web4Keyhole.#transitionBatch.mutations = [];
-    Web4Keyhole.#transitionBatch.nodes = [];
-    Web4Keyhole.#transitionBatch.keyholesInvalidated = false;
-    Web4Keyhole.#transitionBatch.concurrent++;
+    Keyhole.#transitionBatch.mutations = [];
+    Keyhole.#transitionBatch.nodes = [];
+    Keyhole.#transitionBatch.keyholesInvalidated = false;
+    Keyhole.#transitionBatch.concurrent++;
 
     document.startViewTransition(() => {
       mutations.forEach(mutation => mutation());
     })
     .finished.then(() => {
       nodes.forEach(node => {
-        if (node.style?.viewTransitionName?.startsWith("web4")) {
+        if (node.style?.viewTransitionName?.startsWith("xtml")) {
           node.style.removeProperty("view-transition-name");
           if (node.style.length == 0)
             node.removeAttribute("style");
         }
       });
-      if (--Web4Keyhole.#transitionBatch.concurrent == 0 && keyholesInvalidated)
+      if (--Keyhole.#transitionBatch.concurrent == 0 && keyholesInvalidated)
         document.unregisterKeyholes();
     });
   }
@@ -284,7 +284,7 @@ class WebSocketBridge {
       }
     });
 
-    Web4Keyhole.flushTransitionBatch();
+    Keyhole.flushTransitionBatch();
   }
 
   #unescapeParams(batch) {
@@ -338,15 +338,15 @@ class WebSocketBridge {
         this.#getOrCreateModal().showModal();
         break;
       case WebSocket.OPEN:
-        document.getElementById("web4Modal")?.close();
+        document.getElementById("xtmlModal")?.close();
         break;
       case WebSocket.CLOSING:
       case WebSocket.CLOSED:
         this.#getOrCreateModal().showModal();
-        document.getElementById("web4ModalMessage").textContent = e.reason ? e.reason : "Looking for server...";
+        document.getElementById("xtmlModalMessage").textContent = e.reason ? e.reason : "Looking for server...";
         if (this.#reconnectionAttempts == 0) {
           while (++this.#reconnectionAttempts <= 10) {
-            console.debug(`Web4 reconnect: (attempt ${this.#reconnectionAttempts} of 10)...`);
+            console.debug(`XTML reconnect: (attempt ${this.#reconnectionAttempts} of 10)...`);
             new WebSocket(`/_app/alive`)
               .onopen = e => location.reload();
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -358,33 +358,33 @@ class WebSocketBridge {
   }
   
   #getOrCreateModal() {
-    let web4Modal = document.getElementById("web4Modal");
-    if (!web4Modal) {
-      const WEB4_MODAL_TEMPLATE = `
-        <dialog id="web4Modal" onkeydown="event.preventDefault()">
+    let xtmlModal = document.getElementById("xtmlModal");
+    if (!xtmlModal) {
+      const XTML_MODAL_TEMPLATE = `
+        <dialog id="xtmlModal" onkeydown="event.preventDefault()">
           <div>
             <progress></progress>
-            <div id="web4ModalMessage">Looking for server...</div>
+            <div id="xtmlModalMessage">Looking for server...</div>
           </div>
         </dialog>
         <style>
-          #web4Modal::backdrop { background-color: #ffffff66; backdrop-filter: grayscale(0.75) blur(6px); }
-          #web4Modal:focus { outline: none; }
-          #web4Modal[open] { 
+          #xtmlModal::backdrop { background-color: #ffffff66; backdrop-filter: grayscale(0.75) blur(6px); }
+          #xtmlModal:focus { outline: none; }
+          #xtmlModal[open] { 
             background-color: transparent; 
             border-width: 0;
             animation: .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards zoom-fade-in;
           }
         </style>
       `;
-      document.body.insertAdjacentHTML('beforeend', WEB4_MODAL_TEMPLATE);
-      web4Modal = document.getElementById("web4Modal")
+      document.body.insertAdjacentHTML('beforeend', XTML_MODAL_TEMPLATE);
+      xtmlModal = document.getElementById("xtmlModal")
     }
-    return web4Modal;
+    return xtmlModal;
   }
 }
 
-this.keyholes = new Web4Keyholes();
+this.keyholes = new Keyholes();
 
 Event.prototype.trim = function(members) {
   if (!members)

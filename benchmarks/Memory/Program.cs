@@ -468,7 +468,7 @@ public class Tests
     static readonly bool b = true;
     static readonly Color color = Color.Red;
     static readonly string str = "str";
-    static readonly Uri uri = new Uri("https://web4.dev");
+    static readonly Uri uri = new Uri("https://xtml.dev");
 
 
         

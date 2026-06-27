@@ -18,7 +18,7 @@
     <PackageTags>html;templating;htmlstring;interpolation</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- <PackageIcon>packageIcon.png</PackageIcon> -->
-    <PackageProjectUrl>https://web4.dev/html-string</PackageProjectUrl>
+    <PackageProjectUrl>https://xtml.dev</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/web4foundation/web4-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

@@ -12,8 +12,8 @@ app.MapGet("/hello/{name:alpha}", (string name) => $"Hello {name}!");
 app.MapGet("/wat2/{c}", (int c) => $"Hello {c:c}");
 app.MapGet("/interpolation", () => $"Hello {14:c}");
 
-app.MapWindow("web4", () => $"Hello {14:c}");
-// app.MapWeb4("web4/ctx", ctx => $"Hello {14:c}");
+app.MapWindow("xtml", () => $"Hello {14:c}");
+// app.MapXtml("xtml/ctx", ctx => $"Hello {14:c}");
 
 
 app.Run();

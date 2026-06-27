@@ -17,8 +17,8 @@ var tiles = new List<Point>();
 var step = cellSize;
 
 // Guids
-string web4Assets = ".";
-string web4Head = "";
+string xtmlAssets = ".";
+string xtmlHead = "";
 List<EntryRecord> entries;
 // Guids
 
@@ -91,9 +91,9 @@ app.MapGet("/guids", () => $"""
   <html lang="en">
       <head>
           <meta charset="utf-8" />
-          <link rel="icon" href="{web4Assets}/favicon.png" />
+          <link rel="icon" href="{xtmlAssets}/favicon.png" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {web4Head}
+          {xtmlHead}
       </head>
       <body data-sveltekit-preload-data="hover">
           <div style="display: contents">{GuidTableBody()}</div>

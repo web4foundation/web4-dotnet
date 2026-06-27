@@ -17,7 +17,7 @@ public static partial class Extensions
 {
     /// <summary>
     /// Adds a RouteEndpoint for the specified pattern that establishes a 
-    /// Web4 connection enabling the handling of events and manipulation of the DOM.
+    /// XTML connection enabling the handling of events and manipulation of the DOM.
     /// </summary>
     /// <param name="app">The <see cref="WebApplication"/> to add the route to.</param>
     /// <param name="pattern">The route pattern.</param>
@@ -53,15 +53,15 @@ public static partial class Extensions
             }
         });
 
-        if (!applicationBuilder.Properties.TryGetValue("IS_WEB4_MAPPED", out var isWeb4Mapped))
+        if (!applicationBuilder.Properties.TryGetValue("IS_XTML_MAPPED", out var isXtmlMapped))
         {
-            applicationBuilder.Properties["IS_WEB4_MAPPED"] = true;
+            applicationBuilder.Properties["IS_XTML_MAPPED"] = true;
 
             app.Map("/_app/websocket/ui.js", (HttpContext context) =>
-                WriteAsset(context, "text/javascript", AssetsHelper.GetWeb4Js(context.Request.Headers.AcceptEncoding.ToString())));
+                WriteAsset(context, "text/javascript", AssetsHelper.GetJs(context.Request.Headers.AcceptEncoding.ToString())));
 
             app.Map("/_app/base/ui.css", (HttpContext context) =>
-                WriteAsset(context, "text/css", AssetsHelper.GetWeb4Css(context.Request.Headers.AcceptEncoding.ToString())));
+                WriteAsset(context, "text/css", AssetsHelper.GetCss(context.Request.Headers.AcceptEncoding.ToString())));
 
             app.Map("/_app/alive", async httpContext =>
             {
@@ -108,7 +108,7 @@ public static partial class Extensions
 
             // This allocates.  Boo!  But it occurs after measurement.
             httpContext.Response.Headers["Server-Timing"] = $"""
-                allocations;desc="Allocations: {gc2 - gc1}b", render;desc="Web4.Render";dur={elapsed.TotalNanoseconds / 1_000_000d}
+                allocations;desc="Allocations: {gc2 - gc1}b", render;desc="XTML.Render";dur={elapsed.TotalNanoseconds / 1_000_000d}
                 """;
 
             return pipeWriter.FlushAsync(httpContext.RequestAborted);

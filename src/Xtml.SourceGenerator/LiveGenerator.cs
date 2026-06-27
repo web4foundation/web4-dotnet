@@ -25,7 +25,7 @@ namespace Xtml
             if (context.SyntaxContextReceiver is not SyntaxReceiver receiver)
                 return;
 
-            if (context.Compilation.GetTypeByMetadataName("Web4.Xtml.LiveAttribute") is not INamedTypeSymbol attributeSymbol)
+            if (context.Compilation.GetTypeByMetadataName("Xtml.LiveAttribute") is not INamedTypeSymbol attributeSymbol)
                 return;
 
             // if (context.Compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged") is not INamedTypeSymbol notifySymbol)

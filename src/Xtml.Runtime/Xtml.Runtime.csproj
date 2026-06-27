@@ -18,7 +18,7 @@
     <PackageTags>html;reconciler;reconciliation;diff;diffing;keyholes</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- <PackageIcon>packageIcon.png</PackageIcon> -->
-    <PackageProjectUrl>https://web4.dev/keyholes</PackageProjectUrl>
+    <PackageProjectUrl>https://xtml.dev</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/web4foundation/web4-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -26,8 +26,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../Xtml.Templating/Xtml.Templating.csproj" />
-    <EmbeddedResource Include="Assets/web4.js" />
-    <EmbeddedResource Include="Assets/web4.css" />
+    <EmbeddedResource Include="Assets/ui.js" />
+    <EmbeddedResource Include="Assets/ui.css" />
     <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
   

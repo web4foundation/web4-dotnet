@@ -5,46 +5,45 @@ namespace Xtml.Runtime.Assets;
 
 public static class AssetsHelper
 {
-    private static readonly Lazy<byte[]> Web4Js = new(() => Load("web4.js"));
-    private static readonly Lazy<byte[]> Web4JsGzip = new(() => CompressGZip(Web4Js.Value));
-    private static readonly Lazy<byte[]> Web4JsBr = new(() => CompressBrotli(Web4Js.Value));
+    private static readonly Lazy<byte[]> Js = new(() => Load("ui.js"));
+    private static readonly Lazy<byte[]> JsGzip = new(() => CompressGZip(Js.Value));
+    private static readonly Lazy<byte[]> JsBr = new(() => CompressBrotli(Js.Value));
+    private static readonly Lazy<byte[]> Css = new(() => Load("ui.css"));
+    private static readonly Lazy<byte[]> CssGzip = new(() => CompressGZip(Css.Value));
+    private static readonly Lazy<byte[]> CssBr = new(() => CompressBrotli(Css.Value));
 
-    private static readonly Lazy<byte[]> Web4Css = new(() => Load("web4.css"));
-    private static readonly Lazy<byte[]> Web4CssGzip = new(() => CompressGZip(Web4Css.Value));
-    private static readonly Lazy<byte[]> Web4CssBr = new(() => CompressBrotli(Web4Css.Value));
+    public static byte[] JS => Js.Value;
+    public static byte[] JS_GZIP => JsGzip.Value;
+    public static byte[] JS_BR => JsBr.Value;
 
-    public static byte[] WEB4_JS => Web4Js.Value;
-    public static byte[] WEB4_JS_GZIP => Web4JsGzip.Value;
-    public static byte[] WEB4_JS_BR => Web4JsBr.Value;
+    public static byte[] CSS => Css.Value;
+    public static byte[] CSS_GZIP => CssGzip.Value;
+    public static byte[] CSS_BR => CssBr.Value;
 
-    public static byte[] WEB4_CSS => Web4Css.Value;
-    public static byte[] WEB4_CSS_GZIP => Web4CssGzip.Value;
-    public static byte[] WEB4_CSS_BR => Web4CssBr.Value;
-
-    public static (byte[] Body, string? ContentEncoding) GetWeb4Js(string? acceptEncoding)
+    public static (byte[] Body, string? ContentEncoding) GetJs(string? acceptEncoding)
     {
         if (acceptEncoding is not null)
         {
             if (Accepts(acceptEncoding, "br"))
-                return (WEB4_JS_BR, "br");
+                return (JS_BR, "br");
             if (Accepts(acceptEncoding, "gzip"))
-                return (WEB4_JS_GZIP, "gzip");
+                return (JS_GZIP, "gzip");
         }
 
-        return (WEB4_JS, null);
+        return (JS, null);
     }
 
-    public static (byte[] Body, string? ContentEncoding) GetWeb4Css(string? acceptEncoding)
+    public static (byte[] Body, string? ContentEncoding) GetCss(string? acceptEncoding)
     {
         if (acceptEncoding is not null)
         {
             if (Accepts(acceptEncoding, "br"))
-                return (WEB4_CSS_BR, "br");
+                return (CSS_BR, "br");
             if (Accepts(acceptEncoding, "gzip"))
-                return (WEB4_CSS_GZIP, "gzip");
+                return (CSS_GZIP, "gzip");
         }
 
-        return (WEB4_CSS, null);
+        return (CSS, null);
     }
 
     private static bool Accepts(string acceptEncoding, string encoding)

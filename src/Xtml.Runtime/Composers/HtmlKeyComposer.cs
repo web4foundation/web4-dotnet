@@ -387,7 +387,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
 
         Writer.Write("""
 
-                <!-- Injected by Web4 -->
+                <!-- Injected by XTML -->
                 <script src="/_app/websocket/ui.js" defer></script>
                 <link href="/_app/base/ui.css" rel="stylesheet" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -446,11 +446,11 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             key[i] = Key[i] == ':' ? (byte)'-' : Key[i];
         Writer.WriteRaw($$"""
             <style>
-                ::view-transition-group(web4-fwd-{{key}}, web4-rev-{{key}}) { animation: none; }
-                ::view-transition-new(web4-fwd-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in; }
-                ::view-transition-old(web4-fwd-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out; }
-                ::view-transition-new(web4-rev-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out reverse; }
-                ::view-transition-old(web4-rev-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in reverse; }
+                ::view-transition-group(xtml-fwd-{{key}}, xtml-rev-{{key}}) { animation: none; }
+                ::view-transition-new(xtml-fwd-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in; }
+                ::view-transition-old(xtml-fwd-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out; }
+                ::view-transition-new(xtml-rev-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out reverse; }
+                ::view-transition-old(xtml-rev-{{key}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in reverse; }
             </style>
             """);
     }
