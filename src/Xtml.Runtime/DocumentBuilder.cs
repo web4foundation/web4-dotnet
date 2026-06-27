@@ -2,7 +2,7 @@ using Xtml.Dom.EventListeners;
 using System.Drawing;
 using Xtml.Dom;
 
-namespace Keyholes;
+namespace Xtml.Runtime;
 
 public class DocumentBuilder(WindowBuilder window) :
     IDocumentEventListeners,

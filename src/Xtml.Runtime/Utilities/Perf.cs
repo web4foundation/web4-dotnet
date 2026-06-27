@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Keyholes.Utilities;
+namespace Xtml.Runtime.Utilities;
 
 public static class Perf
 {

@@ -2,7 +2,7 @@ using System.Text;
 using Xtml.Dom;
 using Xtml.Templating;
 
-namespace Keyholes.Utilities;
+namespace Xtml.Runtime.Utilities;
 
 // TODO: Clean this up.  Many, many memory allocations.
 

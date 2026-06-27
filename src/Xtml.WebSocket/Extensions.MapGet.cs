@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Routing;
 using Xtml.Templating;
-using Keyholes.Composers;
+using Xtml.Runtime.Composers;
 
 namespace Xtml.WebSocket;
 

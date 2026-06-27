@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Runtime.CompilerServices;
 
-namespace Keyholes;
+namespace Xtml.Runtime;
 
 public struct Keyhole
 {

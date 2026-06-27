@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Keyholes.Utilities;
+namespace Xtml.Runtime.Utilities;
 
 [InterpolatedStringHandler]
 [StructLayout(LayoutKind.Auto)]

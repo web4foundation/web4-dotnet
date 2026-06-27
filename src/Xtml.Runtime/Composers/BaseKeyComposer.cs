@@ -3,7 +3,7 @@ using Xtml.Templating;
 using Xtml.Templating.Composers;
 using Xtml.Dom;
 
-namespace Keyholes.Composers;
+namespace Xtml.Runtime.Composers;
 
 public abstract class BaseKeyComposer : BaseComposer
 {

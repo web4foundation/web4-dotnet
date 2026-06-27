@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using Xtml.Templating;
 using Xtml.Dom;
 
-namespace Keyholes.Composers;
+namespace Xtml.Runtime.Composers;
 
 public class SnapshotKeyComposer : BaseKeyComposer
 {

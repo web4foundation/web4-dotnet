@@ -3,7 +3,7 @@ using Xtml.Templating;
 using Xtml.Templating.Composers;
 using Microsoft.AspNetCore.Http;
 
-namespace Keyholes.Composers;
+namespace Xtml.Runtime.Composers;
 
 public class HttpResponseComposer(HttpResponse httpResponse) : HtmlComposer(httpResponse.BodyWriter)
 {

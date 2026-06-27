@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Keyholes;
+namespace Xtml.Runtime;
 
 public class KeyCursor
 {

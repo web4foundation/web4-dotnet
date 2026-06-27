@@ -1,6 +1,6 @@
 using Xtml.Dom;
 
-namespace Keyholes;
+namespace Xtml.Runtime;
 
 public interface IRpcServer
 {

@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace Keyholes.Assets;
+namespace Xtml.Runtime.Assets;
 
 public static class AssetsHelper
 {

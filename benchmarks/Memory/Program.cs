@@ -6,8 +6,8 @@ using BenchmarkDotNet.Running;
 using Xtml.Templating;
 using Xtml.Templating.Composers;
 using Xtml.Composers;
-using Keyholes;
-using Keyholes.Composers;
+using Xtml.Runtime;
+using Xtml.Runtime.Composers;
 
 BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 
