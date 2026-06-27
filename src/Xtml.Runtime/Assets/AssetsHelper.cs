@@ -5,11 +5,11 @@ namespace Keyholes.Assets;
 
 public static class AssetsHelper
 {
-    private static readonly Lazy<byte[]> Web4Js = new(() => Load("Keyholes.Assets.web4.js"));
+    private static readonly Lazy<byte[]> Web4Js = new(() => Load("web4.js"));
     private static readonly Lazy<byte[]> Web4JsGzip = new(() => CompressGZip(Web4Js.Value));
     private static readonly Lazy<byte[]> Web4JsBr = new(() => CompressBrotli(Web4Js.Value));
 
-    private static readonly Lazy<byte[]> Web4Css = new(() => Load("Keyholes.Assets.web4.css"));
+    private static readonly Lazy<byte[]> Web4Css = new(() => Load("web4.css"));
     private static readonly Lazy<byte[]> Web4CssGzip = new(() => CompressGZip(Web4Css.Value));
     private static readonly Lazy<byte[]> Web4CssBr = new(() => CompressBrotli(Web4Css.Value));
 
@@ -63,9 +63,8 @@ public static class AssetsHelper
     }
 
     private static byte[] Load(string resourceName) =>
-        Encoding.UTF8.GetBytes(new StreamReader(System.Reflection.Assembly
-            .GetExecutingAssembly()
-            .GetManifestResourceStream(resourceName)!
+        Encoding.UTF8.GetBytes(new StreamReader(typeof(AssetsHelper).Assembly
+            .GetManifestResourceStream($"{typeof(AssetsHelper).Assembly.GetName().Name}.Assets.{resourceName}")!
         ).ReadToEnd());
 
     private static byte[] CompressGZip(byte[] data)
