@@ -5,11 +5,6 @@ namespace Xtml.WebSocket;
 public static class HotReload
 {
     public static int ReloadCount { get; private set; } = 0;
-    public static IDisposable Listen(Func<Task> action) => new NoOp();
-    class NoOp : IDisposable
-    {
-        public void Dispose() { }
-    }
 }
 
 #else
