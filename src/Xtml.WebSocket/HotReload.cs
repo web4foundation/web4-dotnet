@@ -9,7 +9,6 @@ public static class HotReload
 
 #else
 
-using System.Diagnostics;
 using System.Reflection.Metadata;
 
 [assembly: MetadataUpdateHandler(typeof(Xtml.WebSocket.HotReload))]
