@@ -316,18 +316,18 @@ class WebSocketBridge {
 
       if (iNew >= 0) {
         let name = rpc.params[iNew];
-        let occurrances = duplicatesNew[name] ?? 0;
-        duplicatesNew[name] = ++occurrances;
-        if (occurrances > 1)
-          rpc.params[iNew] = `${name}-${occurrances}`
+        let occurrences = duplicatesNew[name] ?? 0;
+        duplicatesNew[name] = ++occurrences;
+        if (occurrences > 1)
+          rpc.params[iNew] = `${name}-${occurrences}`
       }
 
       if (iOld >= 0) {
         let name = rpc.params[iOld];
-        let occurrances = duplicatesOld[name] ?? 0;
-        duplicatesOld[name] = ++occurrances;
-        if (occurrances > 1)
-          rpc.params[iOld] = `${name}-${occurrances}`
+        let occurrences = duplicatesOld[name] ?? 0;
+        duplicatesOld[name] = ++occurrences;
+        if (occurrences > 1)
+          rpc.params[iOld] = `${name}-${occurrences}`
       }
     });
   }
