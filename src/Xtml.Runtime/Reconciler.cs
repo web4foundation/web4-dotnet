@@ -4,6 +4,8 @@ namespace Xtml.Runtime;
 
 public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] newBuffer)
 {
+    public static readonly byte[] ROOT_KEY = "root"u8.ToArray();
+
     public static void Diff(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] newBuffer)
     {
         using var perf = Perf.Measure("DiffUtil.Diff"); // TODO: Remove PerfCheck
@@ -101,7 +103,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
                 else if (newParent.TransitionModifier == null)
                     mutator.SetNode(
                         newBuffer,
-                        newParent.Key,
+                        newParent.Key ?? ROOT_KEY, // Only HotReload can change the root string literal.
                         newSpan
                     );
                 else

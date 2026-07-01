@@ -47,7 +47,7 @@ class Keyhole {
   };
 
   static {
-    document.addEventListener('DOMContentLoaded', () => document.registerKeyholes());
+    document.addEventListener('DOMContentLoaded', () => document.body.registerKeyholes('root'));
   }
 
   constructor(bridge, key, node) {
@@ -123,6 +123,12 @@ class Keyhole {
   #createNode(rawHtml) {
     if (!rawHtml)
       return document.createTextNode("");
+
+    if (this.key == 'root') {
+      const newDoc = new DOMParser().parseFromString(rawHtml, 'text/html');
+      document.title = newDoc.title;
+      return newDoc.body;
+    }
 
     let fragment = document.createRange().createContextualFragment(rawHtml);
     return fragment.children[0] ?? fragment.childNodes[0];

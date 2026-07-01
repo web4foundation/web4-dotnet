@@ -29,6 +29,18 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
     private readonly Channel<ReadOnlySequence<byte>> _outputChannel = CreateOutputChannel();
     private JsonRpcWriter JsonRpc => JsonRpcWriter.Current(_outputChannel.Writer);
 
+    static Bridge()
+    {
+        HotReload.UpdateApplicationEvent += updatedTypes =>
+        {
+            foreach (var bridge in _windows.Values)
+            {
+                bridge.Invalidate();
+                bridge.Reconcile();
+            }
+        };
+    }
+
     public static async Task Bind(
         HttpContext http,
         WindowBuilder windowBuilder,
