@@ -5,6 +5,7 @@ namespace Xtml.WebSocket;
 public static class HotReload
 {
     public static int ReloadCount { get; private set; } = 0;
+    public static event Action<Type[]?>? UpdateApplicationEvent;
 }
 
 #else
