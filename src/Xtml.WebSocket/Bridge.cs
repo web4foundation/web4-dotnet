@@ -49,9 +49,9 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
         ILogger logger,
         CancellationToken cancelProcess)
     {
-        // TODO: Move to header approach?
-        var windowID = http.Connection.Id;
         var bridge = new Bridge(http, windowBuilder, logger);
+        if (SnapshotStrategy == SnapshotStrategy.Retain)
+            bridge._snapshot ??= bridge.CaptureSnapshot();
 
         // TODO: Move to config
         var context = new WebSocketAcceptContext
@@ -62,7 +62,9 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
         using var webSocket = await http.WebSockets.AcceptWebSocketAsync(context);
         using var reg = cancelProcess.Register(async () => await Disconnect(webSocket));
 
-        _windows[windowID] = bridge;
+        // TODO: Move to header approach?
+        var windowID = http.Connection.Id;
+        _windows[windowID] = bridge;        
 
         await Task.WhenAny(
             bridge.OutputToWebSocket(webSocket, http.RequestAborted),
