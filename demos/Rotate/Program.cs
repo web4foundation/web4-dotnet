@@ -10,6 +10,21 @@ var app = builder.Build();
 var alpha = 0;
 var beta = 90;
 var gamma = 0;
+var color = Color.FromArgb(0x040255);
+
+Html Demo() => $"""
+    <div>
+        <div style={$"transform: rotateX(90deg) rotateZ({-alpha}deg) rotateX({-beta}deg) rotateY({gamma}deg)"}>
+            { QrCode(color) }
+        </div>
+        <div>
+            Rotation: ({alpha}, {beta}, {gamma})
+        </div>
+        <div>
+            Color: <input type="color" value={color} oninput={e => color = e.Target.Value} />
+        </div>
+    </div>
+""";
 
 var window = app.MapWindow("/grant/rotate", () => $$"""
     <!doctype html>
@@ -18,15 +33,24 @@ var window = app.MapWindow("/grant/rotate", () => $$"""
             <title>Rotate Demo</title>
         </head>
         <body>
-          <button onclick="enableSensors()">Grant Permission for DeviceOrientation</button>
+          <div style="display: flex; justify-content: space-evenly;">
+            <div style={{$"transform: rotateX(90deg) rotateZ({-alpha}deg) rotateX({-beta}deg) rotateY({gamma}deg)"}}>
+                {{ QrCode(color) }}
+            </div>
+          </div>
+
           <h1 style="text-align: center">({{alpha}}, {{beta}}, {{gamma}})</h1>
-          <img src="https://quickchart.io/qr?text=https://chewy.local:5011/grant/" style={{$"transform: rotateX(90deg) rotateZ({-alpha}deg) rotateX({-beta}deg) rotateY({gamma}deg)"}} />
+
+
+          <button style="font-size: 16pt; height: 48px; margin: 0px 16px;" onclick="enableSensors()">
+            Allow DeviceOrientation
+          </button>
 
           <p>
             A few notes:
             <ul>
               <li>
-                Be sure to grant permissions using the button at the top.
+                Your browser cannot read the accelerometer until you grant permissions for DeviceOrientation using the button above.
               </li>
               <li>
                 It's recommended to turn on your phone's orientation lock to prevent switching from portrait to landscape during rotation.
@@ -1707,7 +1731,7 @@ app.MapWindow("/grant", () => $$"""
         <li class="c11 c23 li-bullet-0"><span class="c2 c1">This MCP server could be given any HTML file(s) as input.
                 &nbsp;It would then perform as the webserver for the iFrame. &nbsp;</span></li>
         <li class="c11 c23 li-bullet-0"><span class="c2 c1">This MCP server would inject a script tag that connects the
-                iFrame&rsquo;s HTML back to the same MCP server over a Streaming HTTP connection. &nbsp;This connection
+                iFrame&rsquo;s HTML back to the same MCP server over a Streamable HTTP connection. &nbsp;This connection
                 would bubble events from any subscribed DOM listeners beyond the iFrame and up to the MCP server where
                 it could use its DOM-adjacent runtime to handle the event, potentially change state, thus triggering
                 signals that actuate the DOM remotely over the same bi-directional connection.</span></li>
@@ -1817,8 +1841,7 @@ app.MapWindow("/grant", () => $$"""
     </ol>
     <hr style="page-break-before:always;display:none;">
     <h1 class="c12" id="h.yi0wy3gwp8jq">
-      <div style="text-align: center">({{alpha}}, {{beta}}, {{gamma}})</div>
-      <img src="https://quickchart.io/qr?text=https://xtml.dev/grant/rotate" style={{$"transform: rotateX(90deg) rotateZ({-alpha}deg) rotateX({-beta}deg) rotateY({gamma}deg)"}} />
+      {{ Demo() }}
     </h1>
     <h1 class="c12" id="h.uwr3mmb3farm"><span class="c32 c18 c16">Budget</span></h1>
     <p class="c11"><span class="c1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This project will be completed by a
@@ -2114,3 +2137,338 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 """;
 
 app.Run();
+
+Html QrCode(Color color) => $"""
+    <svg width="264" height="264" viewBox="0 0 264 264"
+            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <rect x="0" y="0" width="264" height="264" fill="#ffffff"/>
+    <defs>
+    <rect id="p" width="8" height="8"/>
+    </defs>
+    <g fill={color:hex}>
+    <use xlink:href="#p" x="32" y="32"/>
+    <use xlink:href="#p" x="32" y="40"/>
+    <use xlink:href="#p" x="32" y="48"/>
+    <use xlink:href="#p" x="32" y="56"/>
+    <use xlink:href="#p" x="32" y="64"/>
+    <use xlink:href="#p" x="32" y="72"/>
+    <use xlink:href="#p" x="32" y="80"/>
+    <use xlink:href="#p" x="32" y="96"/>
+    <use xlink:href="#p" x="32" y="176"/>
+    <use xlink:href="#p" x="32" y="184"/>
+    <use xlink:href="#p" x="32" y="192"/>
+    <use xlink:href="#p" x="32" y="200"/>
+    <use xlink:href="#p" x="32" y="208"/>
+    <use xlink:href="#p" x="32" y="216"/>
+    <use xlink:href="#p" x="32" y="224"/>
+    <use xlink:href="#p" x="40" y="32"/>
+    <use xlink:href="#p" x="40" y="80"/>
+    <use xlink:href="#p" x="40" y="96"/>
+    <use xlink:href="#p" x="40" y="112"/>
+    <use xlink:href="#p" x="40" y="128"/>
+    <use xlink:href="#p" x="40" y="136"/>
+    <use xlink:href="#p" x="40" y="152"/>
+    <use xlink:href="#p" x="40" y="160"/>
+    <use xlink:href="#p" x="40" y="176"/>
+    <use xlink:href="#p" x="40" y="224"/>
+    <use xlink:href="#p" x="48" y="32"/>
+    <use xlink:href="#p" x="48" y="48"/>
+    <use xlink:href="#p" x="48" y="56"/>
+    <use xlink:href="#p" x="48" y="64"/>
+    <use xlink:href="#p" x="48" y="80"/>
+    <use xlink:href="#p" x="48" y="120"/>
+    <use xlink:href="#p" x="48" y="136"/>
+    <use xlink:href="#p" x="48" y="152"/>
+    <use xlink:href="#p" x="48" y="160"/>
+    <use xlink:href="#p" x="48" y="176"/>
+    <use xlink:href="#p" x="48" y="192"/>
+    <use xlink:href="#p" x="48" y="200"/>
+    <use xlink:href="#p" x="48" y="208"/>
+    <use xlink:href="#p" x="48" y="224"/>
+    <use xlink:href="#p" x="56" y="32"/>
+    <use xlink:href="#p" x="56" y="48"/>
+    <use xlink:href="#p" x="56" y="56"/>
+    <use xlink:href="#p" x="56" y="64"/>
+    <use xlink:href="#p" x="56" y="80"/>
+    <use xlink:href="#p" x="56" y="96"/>
+    <use xlink:href="#p" x="56" y="120"/>
+    <use xlink:href="#p" x="56" y="128"/>
+    <use xlink:href="#p" x="56" y="144"/>
+    <use xlink:href="#p" x="56" y="160"/>
+    <use xlink:href="#p" x="56" y="176"/>
+    <use xlink:href="#p" x="56" y="192"/>
+    <use xlink:href="#p" x="56" y="200"/>
+    <use xlink:href="#p" x="56" y="208"/>
+    <use xlink:href="#p" x="56" y="224"/>
+    <use xlink:href="#p" x="64" y="32"/>
+    <use xlink:href="#p" x="64" y="48"/>
+    <use xlink:href="#p" x="64" y="56"/>
+    <use xlink:href="#p" x="64" y="64"/>
+    <use xlink:href="#p" x="64" y="80"/>
+    <use xlink:href="#p" x="64" y="96"/>
+    <use xlink:href="#p" x="64" y="104"/>
+    <use xlink:href="#p" x="64" y="120"/>
+    <use xlink:href="#p" x="64" y="136"/>
+    <use xlink:href="#p" x="64" y="144"/>
+    <use xlink:href="#p" x="64" y="152"/>
+    <use xlink:href="#p" x="64" y="160"/>
+    <use xlink:href="#p" x="64" y="176"/>
+    <use xlink:href="#p" x="64" y="192"/>
+    <use xlink:href="#p" x="64" y="200"/>
+    <use xlink:href="#p" x="64" y="208"/>
+    <use xlink:href="#p" x="64" y="224"/>
+    <use xlink:href="#p" x="72" y="32"/>
+    <use xlink:href="#p" x="72" y="80"/>
+    <use xlink:href="#p" x="72" y="120"/>
+    <use xlink:href="#p" x="72" y="144"/>
+    <use xlink:href="#p" x="72" y="160"/>
+    <use xlink:href="#p" x="72" y="176"/>
+    <use xlink:href="#p" x="72" y="224"/>
+    <use xlink:href="#p" x="80" y="32"/>
+    <use xlink:href="#p" x="80" y="40"/>
+    <use xlink:href="#p" x="80" y="48"/>
+    <use xlink:href="#p" x="80" y="56"/>
+    <use xlink:href="#p" x="80" y="64"/>
+    <use xlink:href="#p" x="80" y="72"/>
+    <use xlink:href="#p" x="80" y="80"/>
+    <use xlink:href="#p" x="80" y="96"/>
+    <use xlink:href="#p" x="80" y="112"/>
+    <use xlink:href="#p" x="80" y="128"/>
+    <use xlink:href="#p" x="80" y="144"/>
+    <use xlink:href="#p" x="80" y="160"/>
+    <use xlink:href="#p" x="80" y="176"/>
+    <use xlink:href="#p" x="80" y="184"/>
+    <use xlink:href="#p" x="80" y="192"/>
+    <use xlink:href="#p" x="80" y="200"/>
+    <use xlink:href="#p" x="80" y="208"/>
+    <use xlink:href="#p" x="80" y="216"/>
+    <use xlink:href="#p" x="80" y="224"/>
+    <use xlink:href="#p" x="88" y="104"/>
+    <use xlink:href="#p" x="88" y="136"/>
+    <use xlink:href="#p" x="88" y="144"/>
+    <use xlink:href="#p" x="88" y="152"/>
+    <use xlink:href="#p" x="96" y="32"/>
+    <use xlink:href="#p" x="96" y="80"/>
+    <use xlink:href="#p" x="96" y="88"/>
+    <use xlink:href="#p" x="96" y="112"/>
+    <use xlink:href="#p" x="96" y="136"/>
+    <use xlink:href="#p" x="96" y="152"/>
+    <use xlink:href="#p" x="96" y="168"/>
+    <use xlink:href="#p" x="96" y="192"/>
+    <use xlink:href="#p" x="96" y="200"/>
+    <use xlink:href="#p" x="96" y="216"/>
+    <use xlink:href="#p" x="96" y="224"/>
+    <use xlink:href="#p" x="104" y="40"/>
+    <use xlink:href="#p" x="104" y="64"/>
+    <use xlink:href="#p" x="104" y="96"/>
+    <use xlink:href="#p" x="104" y="104"/>
+    <use xlink:href="#p" x="104" y="120"/>
+    <use xlink:href="#p" x="104" y="128"/>
+    <use xlink:href="#p" x="104" y="152"/>
+    <use xlink:href="#p" x="104" y="160"/>
+    <use xlink:href="#p" x="104" y="176"/>
+    <use xlink:href="#p" x="104" y="184"/>
+    <use xlink:href="#p" x="104" y="192"/>
+    <use xlink:href="#p" x="104" y="200"/>
+    <use xlink:href="#p" x="104" y="224"/>
+    <use xlink:href="#p" x="112" y="32"/>
+    <use xlink:href="#p" x="112" y="40"/>
+    <use xlink:href="#p" x="112" y="48"/>
+    <use xlink:href="#p" x="112" y="72"/>
+    <use xlink:href="#p" x="112" y="80"/>
+    <use xlink:href="#p" x="112" y="88"/>
+    <use xlink:href="#p" x="112" y="96"/>
+    <use xlink:href="#p" x="112" y="112"/>
+    <use xlink:href="#p" x="112" y="120"/>
+    <use xlink:href="#p" x="112" y="144"/>
+    <use xlink:href="#p" x="112" y="152"/>
+    <use xlink:href="#p" x="112" y="168"/>
+    <use xlink:href="#p" x="112" y="208"/>
+    <use xlink:href="#p" x="112" y="224"/>
+    <use xlink:href="#p" x="120" y="32"/>
+    <use xlink:href="#p" x="120" y="72"/>
+    <use xlink:href="#p" x="120" y="104"/>
+    <use xlink:href="#p" x="120" y="112"/>
+    <use xlink:href="#p" x="120" y="120"/>
+    <use xlink:href="#p" x="120" y="128"/>
+    <use xlink:href="#p" x="120" y="136"/>
+    <use xlink:href="#p" x="120" y="160"/>
+    <use xlink:href="#p" x="120" y="176"/>
+    <use xlink:href="#p" x="120" y="184"/>
+    <use xlink:href="#p" x="120" y="192"/>
+    <use xlink:href="#p" x="120" y="200"/>
+    <use xlink:href="#p" x="120" y="208"/>
+    <use xlink:href="#p" x="120" y="224"/>
+    <use xlink:href="#p" x="128" y="32"/>
+    <use xlink:href="#p" x="128" y="56"/>
+    <use xlink:href="#p" x="128" y="72"/>
+    <use xlink:href="#p" x="128" y="80"/>
+    <use xlink:href="#p" x="128" y="120"/>
+    <use xlink:href="#p" x="128" y="128"/>
+    <use xlink:href="#p" x="128" y="144"/>
+    <use xlink:href="#p" x="128" y="192"/>
+    <use xlink:href="#p" x="128" y="208"/>
+    <use xlink:href="#p" x="128" y="216"/>
+    <use xlink:href="#p" x="136" y="32"/>
+    <use xlink:href="#p" x="136" y="48"/>
+    <use xlink:href="#p" x="136" y="56"/>
+    <use xlink:href="#p" x="136" y="72"/>
+    <use xlink:href="#p" x="136" y="88"/>
+    <use xlink:href="#p" x="136" y="160"/>
+    <use xlink:href="#p" x="136" y="176"/>
+    <use xlink:href="#p" x="136" y="184"/>
+    <use xlink:href="#p" x="136" y="200"/>
+    <use xlink:href="#p" x="136" y="208"/>
+    <use xlink:href="#p" x="144" y="32"/>
+    <use xlink:href="#p" x="144" y="48"/>
+    <use xlink:href="#p" x="144" y="80"/>
+    <use xlink:href="#p" x="144" y="88"/>
+    <use xlink:href="#p" x="144" y="96"/>
+    <use xlink:href="#p" x="144" y="104"/>
+    <use xlink:href="#p" x="144" y="112"/>
+    <use xlink:href="#p" x="144" y="120"/>
+    <use xlink:href="#p" x="144" y="136"/>
+    <use xlink:href="#p" x="144" y="144"/>
+    <use xlink:href="#p" x="144" y="152"/>
+    <use xlink:href="#p" x="144" y="168"/>
+    <use xlink:href="#p" x="144" y="184"/>
+    <use xlink:href="#p" x="144" y="200"/>
+    <use xlink:href="#p" x="144" y="216"/>
+    <use xlink:href="#p" x="152" y="56"/>
+    <use xlink:href="#p" x="152" y="88"/>
+    <use xlink:href="#p" x="152" y="96"/>
+    <use xlink:href="#p" x="152" y="104"/>
+    <use xlink:href="#p" x="152" y="112"/>
+    <use xlink:href="#p" x="152" y="128"/>
+    <use xlink:href="#p" x="152" y="136"/>
+    <use xlink:href="#p" x="152" y="144"/>
+    <use xlink:href="#p" x="152" y="160"/>
+    <use xlink:href="#p" x="152" y="184"/>
+    <use xlink:href="#p" x="152" y="192"/>
+    <use xlink:href="#p" x="152" y="224"/>
+    <use xlink:href="#p" x="160" y="40"/>
+    <use xlink:href="#p" x="160" y="56"/>
+    <use xlink:href="#p" x="160" y="72"/>
+    <use xlink:href="#p" x="160" y="80"/>
+    <use xlink:href="#p" x="160" y="88"/>
+    <use xlink:href="#p" x="160" y="112"/>
+    <use xlink:href="#p" x="160" y="128"/>
+    <use xlink:href="#p" x="160" y="136"/>
+    <use xlink:href="#p" x="160" y="144"/>
+    <use xlink:href="#p" x="160" y="160"/>
+    <use xlink:href="#p" x="160" y="168"/>
+    <use xlink:href="#p" x="160" y="176"/>
+    <use xlink:href="#p" x="160" y="184"/>
+    <use xlink:href="#p" x="160" y="192"/>
+    <use xlink:href="#p" x="160" y="208"/>
+    <use xlink:href="#p" x="160" y="224"/>
+    <use xlink:href="#p" x="168" y="104"/>
+    <use xlink:href="#p" x="168" y="120"/>
+    <use xlink:href="#p" x="168" y="144"/>
+    <use xlink:href="#p" x="168" y="152"/>
+    <use xlink:href="#p" x="168" y="160"/>
+    <use xlink:href="#p" x="168" y="192"/>
+    <use xlink:href="#p" x="168" y="200"/>
+    <use xlink:href="#p" x="168" y="208"/>
+    <use xlink:href="#p" x="168" y="224"/>
+    <use xlink:href="#p" x="176" y="32"/>
+    <use xlink:href="#p" x="176" y="40"/>
+    <use xlink:href="#p" x="176" y="48"/>
+    <use xlink:href="#p" x="176" y="56"/>
+    <use xlink:href="#p" x="176" y="64"/>
+    <use xlink:href="#p" x="176" y="72"/>
+    <use xlink:href="#p" x="176" y="80"/>
+    <use xlink:href="#p" x="176" y="96"/>
+    <use xlink:href="#p" x="176" y="112"/>
+    <use xlink:href="#p" x="176" y="120"/>
+    <use xlink:href="#p" x="176" y="128"/>
+    <use xlink:href="#p" x="176" y="152"/>
+    <use xlink:href="#p" x="176" y="160"/>
+    <use xlink:href="#p" x="176" y="176"/>
+    <use xlink:href="#p" x="176" y="192"/>
+    <use xlink:href="#p" x="176" y="200"/>
+    <use xlink:href="#p" x="176" y="224"/>
+    <use xlink:href="#p" x="184" y="32"/>
+    <use xlink:href="#p" x="184" y="80"/>
+    <use xlink:href="#p" x="184" y="104"/>
+    <use xlink:href="#p" x="184" y="152"/>
+    <use xlink:href="#p" x="184" y="160"/>
+    <use xlink:href="#p" x="184" y="192"/>
+    <use xlink:href="#p" x="184" y="216"/>
+    <use xlink:href="#p" x="192" y="32"/>
+    <use xlink:href="#p" x="192" y="48"/>
+    <use xlink:href="#p" x="192" y="56"/>
+    <use xlink:href="#p" x="192" y="64"/>
+    <use xlink:href="#p" x="192" y="80"/>
+    <use xlink:href="#p" x="192" y="104"/>
+    <use xlink:href="#p" x="192" y="112"/>
+    <use xlink:href="#p" x="192" y="120"/>
+    <use xlink:href="#p" x="192" y="136"/>
+    <use xlink:href="#p" x="192" y="144"/>
+    <use xlink:href="#p" x="192" y="160"/>
+    <use xlink:href="#p" x="192" y="168"/>
+    <use xlink:href="#p" x="192" y="176"/>
+    <use xlink:href="#p" x="192" y="184"/>
+    <use xlink:href="#p" x="192" y="192"/>
+    <use xlink:href="#p" x="192" y="208"/>
+    <use xlink:href="#p" x="192" y="216"/>
+    <use xlink:href="#p" x="200" y="32"/>
+    <use xlink:href="#p" x="200" y="48"/>
+    <use xlink:href="#p" x="200" y="56"/>
+    <use xlink:href="#p" x="200" y="64"/>
+    <use xlink:href="#p" x="200" y="80"/>
+    <use xlink:href="#p" x="200" y="104"/>
+    <use xlink:href="#p" x="200" y="112"/>
+    <use xlink:href="#p" x="200" y="120"/>
+    <use xlink:href="#p" x="200" y="144"/>
+    <use xlink:href="#p" x="200" y="152"/>
+    <use xlink:href="#p" x="200" y="208"/>
+    <use xlink:href="#p" x="200" y="224"/>
+    <use xlink:href="#p" x="208" y="32"/>
+    <use xlink:href="#p" x="208" y="48"/>
+    <use xlink:href="#p" x="208" y="56"/>
+    <use xlink:href="#p" x="208" y="64"/>
+    <use xlink:href="#p" x="208" y="80"/>
+    <use xlink:href="#p" x="208" y="104"/>
+    <use xlink:href="#p" x="208" y="120"/>
+    <use xlink:href="#p" x="208" y="144"/>
+    <use xlink:href="#p" x="208" y="152"/>
+    <use xlink:href="#p" x="208" y="160"/>
+    <use xlink:href="#p" x="208" y="168"/>
+    <use xlink:href="#p" x="208" y="208"/>
+    <use xlink:href="#p" x="208" y="216"/>
+    <use xlink:href="#p" x="216" y="32"/>
+    <use xlink:href="#p" x="216" y="80"/>
+    <use xlink:href="#p" x="216" y="104"/>
+    <use xlink:href="#p" x="216" y="120"/>
+    <use xlink:href="#p" x="216" y="136"/>
+    <use xlink:href="#p" x="216" y="144"/>
+    <use xlink:href="#p" x="216" y="160"/>
+    <use xlink:href="#p" x="216" y="168"/>
+    <use xlink:href="#p" x="216" y="184"/>
+    <use xlink:href="#p" x="216" y="192"/>
+    <use xlink:href="#p" x="216" y="200"/>
+    <use xlink:href="#p" x="216" y="208"/>
+    <use xlink:href="#p" x="216" y="216"/>
+    <use xlink:href="#p" x="224" y="32"/>
+    <use xlink:href="#p" x="224" y="40"/>
+    <use xlink:href="#p" x="224" y="48"/>
+    <use xlink:href="#p" x="224" y="56"/>
+    <use xlink:href="#p" x="224" y="64"/>
+    <use xlink:href="#p" x="224" y="72"/>
+    <use xlink:href="#p" x="224" y="80"/>
+    <use xlink:href="#p" x="224" y="96"/>
+    <use xlink:href="#p" x="224" y="112"/>
+    <use xlink:href="#p" x="224" y="120"/>
+    <use xlink:href="#p" x="224" y="128"/>
+    <use xlink:href="#p" x="224" y="144"/>
+    <use xlink:href="#p" x="224" y="152"/>
+    <use xlink:href="#p" x="224" y="176"/>
+    <use xlink:href="#p" x="224" y="184"/>
+    <use xlink:href="#p" x="224" y="200"/>
+    <use xlink:href="#p" x="224" y="208"/>
+    <use xlink:href="#p" x="224" y="216"/>
+    <use xlink:href="#p" x="224" y="224"/>
+    </g>
+    <g></g></svg>
+""";
