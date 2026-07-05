@@ -29,6 +29,7 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
     private readonly Channel<ReadOnlySequence<byte>> _outputChannel = CreateOutputChannel();
     private JsonRpcWriter JsonRpc => JsonRpcWriter.Current(_outputChannel.Writer);
 
+    #if DEBUG
     static Bridge()
     {
         HotReload.UpdateApplicationEvent += updatedTypes =>
@@ -40,6 +41,7 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
             }
         };
     }
+    #endif
 
     public static async Task Bind(
         HttpContext http,
