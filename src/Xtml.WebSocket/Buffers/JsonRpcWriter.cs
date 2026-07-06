@@ -222,7 +222,7 @@ public partial class JsonRpcWriter : IDisposable
 
         _jsonWriter.WriteStartArray("params");
 
-        WriteHtml(buffer, param1, includeSentinels: true);
+        WriteHtml(buffer, param1);
         _jsonWriter.WriteStringValueSegment("", true);
 
         if (param2.HasValue)
@@ -254,7 +254,7 @@ public partial class JsonRpcWriter : IDisposable
 
         _jsonWriter.WriteStartArray("params");
 
-        WriteHtml(buffer, param1, includeSentinels: true);
+        WriteHtml(buffer, param1);
         _jsonWriter.WriteStringValueSegment("", true);
 
         Span<char> strInt = stackalloc char[11]; // max int length
@@ -291,7 +291,7 @@ public partial class JsonRpcWriter : IDisposable
 
         _jsonWriter.WriteStartArray("params");
 
-        WriteHtml(buffer, param1, includeSentinels: true);
+        WriteHtml(buffer, param1);
         _jsonWriter.WriteStringValueSegment("", true);
 
         _jsonWriter.WriteStringValue(param2);
@@ -350,7 +350,7 @@ public partial class JsonRpcWriter : IDisposable
         _bufferWriter.Advance(key.Length);
     }
 
-    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes, bool includeSentinels)
+    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes)
     {
         for (int i = 0; i < keyholes.Length; i++)
         {
@@ -363,13 +363,10 @@ public partial class JsonRpcWriter : IDisposable
                     break;
                 case KeyholeType.Html:
                     Span<Keyhole> html = buffer.AsSpan(keyhole.Sequence);
-                    WriteHtml(buffer, html, includeSentinels);
-                    if (includeSentinels)
-                    {
-                        _jsonWriter.WriteStringValueSegment("<!--/key:", false);
-                        WriteKey(keyhole.Key);
-                        _jsonWriter.WriteStringValueSegment("-->", false);
-                    }
+                    WriteHtml(buffer, html);
+                    _jsonWriter.WriteStringValueSegment("<!--/key:", false);
+                    WriteKey(keyhole.Key);
+                    _jsonWriter.WriteStringValueSegment("-->", false);
                     break;
                 case KeyholeType.Attribute:
                     Span<Keyhole> attribute = buffer.AsSpan(keyhole.Sequence);
@@ -400,32 +397,23 @@ public partial class JsonRpcWriter : IDisposable
                     {
                         ref var k = ref buffer[i2];
                         Span<Keyhole> iterator = buffer.AsSpan(k.Sequence);
-                        WriteHtml(buffer, iterator, true);
-                        if (includeSentinels)
-                        {
-                            _jsonWriter.WriteStringValueSegment("<!--/key:", false);
-                            WriteKey(keyhole.Key);
-                            _jsonWriter.WriteStringValueSegment("-->", false);
-                        }
-                    }
-                    break;
-                // The rest are the mutable keyhole values.  They might use format strings.
-                default:
-                    if (includeSentinels)
-                    {
-                            _jsonWriter.WriteStringValueSegment("<!--key:", false);
-                            WriteKey(keyhole.Key);
-                            _jsonWriter.WriteStringValueSegment("-->", false);
-                    }
-
-                    WriteMutableKeyholeValue(ref keyhole);
-
-                    if (includeSentinels)
-                    {
+                        WriteHtml(buffer, iterator);
                         _jsonWriter.WriteStringValueSegment("<!--/key:", false);
                         WriteKey(keyhole.Key);
                         _jsonWriter.WriteStringValueSegment("-->", false);
                     }
+                    break;
+                // The rest are the mutable keyhole values.  They might use format strings.
+                default:
+                    _jsonWriter.WriteStringValueSegment("<!--key:", false);
+                    WriteKey(keyhole.Key);
+                    _jsonWriter.WriteStringValueSegment("-->", false);
+
+                    WriteMutableKeyholeValue(ref keyhole);
+
+                    _jsonWriter.WriteStringValueSegment("<!--/key:", false);
+                    WriteKey(keyhole.Key);
+                    _jsonWriter.WriteStringValueSegment("-->", false);
                     break;
             }
         }
