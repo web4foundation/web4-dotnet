@@ -69,7 +69,7 @@ public ref partial struct Html : IDisposable
 
         composer.Grow(literalLength, formattedCount);
 
-        // e.g. $"".  Complier's lowered code calls no Append*() methods for this use case.
+        // e.g. $"".  Compiler's lowered code calls no Append*() methods for this use case.
         if (literalLength == 0 && formattedCount == 0)
             AppendLiteral(string.Empty);
     }
