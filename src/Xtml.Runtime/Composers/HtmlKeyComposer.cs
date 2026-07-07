@@ -10,7 +10,7 @@ namespace Xtml.Runtime.Composers;
 public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     : BaseKeyComposer, IStreamingComposer
 {
-    private enum KeyholeType { TextNode, AttributeValue, AttributeSegment }
+    private enum KeyholeType { TextNode, AttributeValue, Segment }
     private KeyholeType _keyholeType = KeyholeType.TextNode;
     private ReadOnlyMemory<char>? _deferredLiteral = null;
     private bool _isHeadOmitted = false;
@@ -84,7 +84,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case KeyholeType.AttributeSegment:
+            case KeyholeType.Segment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value);
@@ -127,7 +127,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case KeyholeType.AttributeSegment:
+            case KeyholeType.Segment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value ? "true" : "false");
@@ -177,7 +177,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case KeyholeType.AttributeSegment:
+            case KeyholeType.Segment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value, format);
@@ -212,7 +212,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case KeyholeType.AttributeSegment:
+            case KeyholeType.Segment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value, format);
@@ -239,7 +239,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 HandleDeferredLiteral();
                 // ex: `"` (the value will come later in the next On*Keyhole())
                 Writer.Write("\""u8);
-                _keyholeType = KeyholeType.AttributeSegment;
+                _keyholeType = KeyholeType.Segment;
                 break;
         }
 
@@ -259,7 +259,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                     InjectTransition(trns);
                 break;
 
-            case KeyholeType.AttributeSegment:
+            case KeyholeType.Segment:
                 // ex: `" key:{Key}`
                 Writer.Write("\" key:"u8);
                 Writer.Write(Key);
