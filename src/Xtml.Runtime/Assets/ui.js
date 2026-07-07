@@ -487,3 +487,15 @@ HTMLDocument.prototype.unregisterKeyholes = function() {
       delete keyholes[key];
   }
 }
+
+// TODO: I need to audit the full DOM for examples like these.  
+// While keyholes operate as a surrogate for manipulating DOM *elements* using a reactive programming model,
+// the DOM still has many of these properties scattered throughout that operate outside the scope of keyholes.
+
+HTMLDocument.prototype.setTitle = function(title) {
+  document.title = title;
+};
+
+HTMLWindow.prototype.setLocation = function(location) {
+  window.location = location;
+};
