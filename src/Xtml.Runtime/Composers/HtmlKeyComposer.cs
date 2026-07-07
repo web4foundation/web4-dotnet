@@ -44,7 +44,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnMarkup(ref parent, ref literal, relativeOrder);
 
-        // This makes the assumption that keyholes preceeded with an '=' are always attributes.  
+        // This makes the assumption that keyholes preceded with an '=' are always attributes.  
         // Attributes need different sentinels than regular keyholes and boolean attributes 
         // have a few strange rules to follow:
         // https://developer.mozilla.org/en-US/docs/Glossary/Boolean/HTML
