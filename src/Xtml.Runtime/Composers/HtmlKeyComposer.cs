@@ -1,6 +1,5 @@
 using System.Buffers;
 using System.Drawing;
-using System.Text;
 using Xtml.Templating;
 using Xtml.Templating.Composers;
 using Xtml.Dom;
