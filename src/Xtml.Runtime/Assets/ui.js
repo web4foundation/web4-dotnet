@@ -496,6 +496,6 @@ HTMLDocument.prototype.setTitle = function(title) {
   document.title = title;
 };
 
-HTMLWindow.prototype.setLocation = function(location) {
+window.setLocation = function(location) {
   window.location = location;
 };
