@@ -393,7 +393,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
                 <meta charset="UTF-8">
 
-            """u8);
+        """u8);
 
         // Write event handlers set on window or document
         if (Window.Listeners.Count > 0)
