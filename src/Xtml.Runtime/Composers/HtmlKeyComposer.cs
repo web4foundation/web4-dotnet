@@ -368,8 +368,10 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
 
     private void InjectKernel(ref string literal)
     {
-        int headEnd = literal.IndexOf("</head>", StringComparison.Ordinal);
-        _isHeadOmitted = headEnd < 0;
+        int headIndex = literal.IndexOf("<head>", StringComparison.Ordinal);
+        _isHeadOmitted = headIndex < 0;
+        headIndex += 6;
+
         if (_isHeadOmitted)
         {
             Writer.Write("""
@@ -381,7 +383,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
         }
         else
         {
-            Writer.Write(literal.AsSpan(..headEnd));
+            Writer.Write(literal.AsSpan(..headIndex));
         }
 
         Writer.Write("""
@@ -423,7 +425,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
         {
             // Pre-handle the work of OnMarkup, except consider `offset`.
             // Then set `literal` to "" so the next OnMarkup no-ops.
-            int offset = _isHeadOmitted ? 0 : headEnd;
+            int offset = _isHeadOmitted ? 0 : headIndex;
             if (literal.EndsWith('='))
             {
                 _attributeStatus = AttributeStatus.Pending;
