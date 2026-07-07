@@ -32,8 +32,8 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             Writer.Write("""
                     
                 </body>
-                </html>
-                """u8);
+            </html>
+            """u8);
         }
 
         return true;
@@ -415,7 +415,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             Writer.Write("""
 
                 </head>
-            <body>
+                <body>
 
             """u8);
         }
