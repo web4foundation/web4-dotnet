@@ -10,8 +10,8 @@ namespace Xtml.Runtime.Composers;
 public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     : BaseKeyComposer, IStreamingComposer
 {
-    private enum AttributeStatus { None, Pending, InProgress }
-    private AttributeStatus _attributeStatus = AttributeStatus.None;
+    private enum KeyholeType { TextNode, AttributeValue, AttributeSegment }
+    private KeyholeType _keyholeType = KeyholeType.TextNode;
     private ReadOnlyMemory<char>? _deferredLiteral = null;
     private bool _isHeadOmitted = false;
 
@@ -49,7 +49,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
         // https://developer.mozilla.org/en-US/docs/Glossary/Boolean/HTML
         if (literal.EndsWith('='))
         {
-            _attributeStatus = AttributeStatus.Pending;
+            _keyholeType = KeyholeType.AttributeValue;
             _deferredLiteral = literal.AsMemory();
             return true;
         }
@@ -63,28 +63,28 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnStringKeyhole(ref parent, value);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--key:{Key}-->{value}<!--/key:{Key}-->`
                 Writer.Write("<!--key:"u8, Key, "-->"u8);
                 Writer.Write(value);
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 break;
 
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 HandleDeferredLiteral();
                 // ex: `"{value}" key:{Key}`
                 Writer.Write("\""u8);
                 Writer.Write(value);
                 Writer.Write("\" key:"u8);
                 Writer.Write(Key);
-                // status jumps from .Pending to .None because the whole 
+                // status jumps from .AttributeValue to .TextNode because the whole 
                 // attribute is just one value, not a bunch of keyholes+literals.
-                _attributeStatus = AttributeStatus.None;
+                _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case AttributeStatus.InProgress:
+            case KeyholeType.AttributeSegment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value);
@@ -98,16 +98,16 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnBoolKeyhole(ref parent, value);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--key:{Key}-->{b}<!--/key:{Key}-->`
                 Writer.Write("<!--key:"u8, Key, "-->"u8);
                 Writer.Write(value ? "true" : "false");
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 break;
 
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 var attributeName = HandleDeferredLiteral(isBooleanAttribute: true);
                 if (value)
                 {
@@ -122,12 +122,12 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 Writer.Write(attributeName);
                 Writer.Write("\""u8);
 
-                // status jumps from .Pending to .None because the whole 
+                // status jumps from .AttributeValue to .TextNode because the whole 
                 // attribute is just one value, not a bunch of keyholes+literals.
-                _attributeStatus = AttributeStatus.None;
+                _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case AttributeStatus.InProgress:
+            case KeyholeType.AttributeSegment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value ? "true" : "false");
@@ -156,28 +156,28 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
 
         base.OnKeyhole(ref parent);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
                 Writer.Write("<!--key:"u8, Key, "-->"u8);
                 Writer.Write(value, format);
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 break;
 
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 HandleDeferredLiteral();
                 // ex: `"{value:format}" key:{Key}`
                 Writer.Write("\""u8);
                 Writer.Write(value, format);
                 Writer.Write("\" key:"u8);
                 Writer.Write(Key);
-                // status jumps from .Pending to .None because the whole 
+                // status jumps from .AttributeValue to .TextNode because the whole 
                 // attribute is just one value, not a bunch of keyholes+literals.
-                _attributeStatus = AttributeStatus.None;
+                _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case AttributeStatus.InProgress:
+            case KeyholeType.AttributeSegment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value, format);
@@ -191,28 +191,28 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnColorKeyhole(ref parent, value, format);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
                 Writer.Write("<!--key:"u8, Key, "-->"u8);
                 Writer.Write(value, format);
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 break;
 
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 HandleDeferredLiteral();
                 // ex: `"{value:format}" key:{Key}`
                 Writer.Write("\""u8);
                 Writer.Write(value, format);
                 Writer.Write("\" key:"u8);
                 Writer.Write(Key);
-                // status jumps from .Pending to .None because the whole 
+                // status jumps from .AttributeValue to .TextNode because the whole 
                 // attribute is just one value, not a bunch of keyholes+literals.
-                _attributeStatus = AttributeStatus.None;
+                _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case AttributeStatus.InProgress:
+            case KeyholeType.AttributeSegment:
                 // No sentinels.  This keyhole is a part of a larger attribute
                 // composed of multiple keyholes+literals.  Write only the value.
                 Writer.Write(value, format);
@@ -229,17 +229,17 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnHtmlBegin(ref html, relativeOrder);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--key:{Key}-->`
                 Writer.Write("<!--key:"u8, Key, "-->"u8);
                 break;
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 HandleDeferredLiteral();
                 // ex: `"` (the value will come later in the next On*Keyhole())
                 Writer.Write("\""u8);
-                _attributeStatus = AttributeStatus.InProgress;
+                _keyholeType = KeyholeType.AttributeSegment;
                 break;
         }
 
@@ -250,23 +250,23 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnHtmlEnd(ref parent, html, relativeOrder, transition, expression);
 
-        switch (_attributeStatus)
+        switch (_keyholeType)
         {
-            case AttributeStatus.None:
+            case KeyholeType.TextNode:
                 // ex: `<!--/key:{Key}-->`
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 if (transition is {} trns)
                     InjectTransition(trns);
                 break;
 
-            case AttributeStatus.InProgress:
+            case KeyholeType.AttributeSegment:
                 // ex: `" key:{Key}`
                 Writer.Write("\" key:"u8);
                 Writer.Write(Key);
-                _attributeStatus = AttributeStatus.None;
+                _keyholeType = KeyholeType.TextNode;
                 break;
 
-            case AttributeStatus.Pending:
+            case KeyholeType.AttributeValue:
                 throw new NotSupportedException("Attributes cannot have nested Htmls");
         }
 
@@ -294,7 +294,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     public override bool OnListener(ref Html parent, Action<Event> listener, string? trim = null, string? expression = null) => OnListener(ref parent, includeEventArg: true, trim);
     public override bool OnListener(ref Html parent, Func<Task> listener, string? trim = null, string? expression = null) => OnListener(ref parent, includeEventArg: false, trim);
     public override bool OnListener(ref Html parent, Func<Event, Task> listener, string? trim = null, string? expression = null) => OnListener(ref parent, includeEventArg: true, trim);
-    private bool OnListener(ref Html parent, bool includeEventArg, string? format = null)
+    private bool OnListener(ref Html parent, bool includeEventArg, string? trim = null)
     {
         base.OnKeyhole(ref parent);
 
@@ -309,17 +309,17 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             Writer.Write("'].dispatchEvent(event)\" key:"u8);
             Writer.Write(Key);
         }
-        else if (format is not null)
+        else if (trim is not null)
         {
             // ex: `"keyholes['1:2:3'].dispatchEvent(event,'x,y'))" key:1:2:3`
             Writer.Write("\"keyholes['"u8);
             Writer.Write(Key);
             Writer.Write("'].dispatchEvent(event,'"u8);
-            Writer.Write(format);
+            Writer.Write(trim);
             Writer.Write("')\" key:"u8);
             Writer.Write(Key);
         }
-        else if (format is null)
+        else if (trim is null)
         {
             // ex: `"keyholes['1:2:3'].dispatchEvent(event,'*'))" key:1:2:3`
             Writer.Write("\"keyholes['"u8);
@@ -328,7 +328,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             Writer.Write(Key);
         }
         
-        _attributeStatus = AttributeStatus.None;
+        _keyholeType = KeyholeType.TextNode;
         return true;
     }
 
@@ -428,7 +428,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             int offset = _isHeadOmitted ? 0 : headIndex;
             if (literal.EndsWith('='))
             {
-                _attributeStatus = AttributeStatus.Pending;
+                _keyholeType = KeyholeType.AttributeValue;
                 _deferredLiteral = literal.AsMemory(offset);
             }
             else
@@ -460,7 +460,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         Writer = null!;
         Window = null!;
-        _attributeStatus = AttributeStatus.None;
+        _keyholeType = KeyholeType.TextNode;
         base.Reset();
     }
 
