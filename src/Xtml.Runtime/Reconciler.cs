@@ -186,7 +186,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
                 ref var startKeyhole = ref newBuffer[newParent.SequenceStart];
                 mutator.SetValue(newParent.Key, newBuffer.AsSpan(startKeyhole.Sequence));
 
-                // Shortcircuit.  No need to diff the rest of this span.
+                // Short circuit.  No need to diff the rest of this span.
                 // This whole attribute sequence will be updated.
                 return true;
             }
