@@ -57,7 +57,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
                     (oldParent.RelativeOrder <= newParent.RelativeOrder ? "xtml-fwd-" : "xtml-rev-", newParent.Key)
                 );
 
-            // Shortcircuit.  No need to finish diffing this span or traverse deeper
+            // Short circuit.  No need to finish diffing this span or traverse deeper
             // since this whole span (and possibly its children) will be sent to the browser.
             return true;
         }
@@ -114,7 +114,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
                         (oldParent.RelativeOrder <= newParent.RelativeOrder ? "xtml-fwd-" : "xtml-rev-", newParent.Key)
                     );
 
-                // Shortcircuit.  This whole segment (and possibly its children) will be replaced 
+                // Short circuit.  This whole segment (and possibly its children) will be replaced 
                 // so there's no need to diff its mutables or traverse deeper.
                 return true;
             }
