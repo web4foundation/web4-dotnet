@@ -71,7 +71,7 @@ public struct Keyhole
             KeyholeType.StringLiteral
                 => Object.ReferenceEquals(left._reference, right._reference),
             KeyholeType.String
-                => left._reference == right._reference,
+                => left.String == right.String,
             KeyholeType.Uri
                 => left._reference == right._reference && left.FormatModifier == right.FormatModifier,
             KeyholeType.Boolean
