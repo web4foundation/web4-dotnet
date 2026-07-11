@@ -483,7 +483,7 @@ HTMLDocument.prototype.unregisterKeyholes = function() {
     let node = keyholes[key].node;
     if (node.nodeType == Node.ATTRIBUTE_NODE)
       node = node.ownerElement;
-    if (node instanceof Node && node != document && !document.body.contains(node))
+    if (node instanceof Node && node != document && !document.contains(node))
       delete keyholes[key];
   }
 }
