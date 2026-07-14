@@ -6,7 +6,7 @@ using Xtml.Dom;
 
 namespace Xtml.Templating;
 
-public enum HtmlType { Default, Template, Wrapper }
+public enum HtmlType { Node, Template, Wrapper }
 
 [InterpolatedStringHandler]
 [StructLayout(LayoutKind.Auto)]
@@ -64,7 +64,7 @@ public ref partial struct Html : IDisposable
         Type = (literalLength, composer.LiteralLength) switch {
             (0, 0) => HtmlType.Wrapper,
             (> 0, 0) => HtmlType.Template,
-            _ => HtmlType.Default
+            _ => HtmlType.Node
         };
 
         composer.Grow(literalLength, formattedCount);
@@ -77,7 +77,7 @@ public ref partial struct Html : IDisposable
     private Html(BaseComposer composer, int iteratorCount)
     {
         FormattedCount = iteratorCount;
-        Type = HtmlType.Default;
+        Type = HtmlType.Node;
         _composer = composer;
         // composer.Grow(0, iteratorCount);
     }
