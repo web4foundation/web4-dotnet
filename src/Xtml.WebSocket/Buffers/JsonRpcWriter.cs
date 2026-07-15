@@ -197,7 +197,7 @@ public partial class JsonRpcWriter : IDisposable
 
         _jsonWriter.WriteStartArray("params");
 
-        WriteAttributeSequence(param1);
+        WriteRawSequence(param1);
         _jsonWriter.WriteStringValueSegment("", true);
 
         _jsonWriter.WriteEndArray();
