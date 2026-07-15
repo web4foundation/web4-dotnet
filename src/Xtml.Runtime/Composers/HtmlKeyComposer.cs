@@ -12,6 +12,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
 {
     private ReadOnlyMemory<char>? _deferredLiteral = null;
     private bool _isHeadOmitted = false;
+    private bool _isHtmlAnAttribute = false;
 
     public IBufferWriter<byte> Writer { get; set; } = writer;
     public WindowBuilder Window { get; set; } = window;
@@ -54,7 +55,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnStringKeyhole(ref parent, value);
 
-        if (parent.SuppressKeyholes)
+        if (parent.Type == HtmlType.Raw)
         {
             Writer.Write(value);
         }
@@ -81,7 +82,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnBoolKeyhole(ref parent, value);
 
-        if (parent.SuppressKeyholes)
+        if (parent.Type == HtmlType.Raw)
         {
             Writer.Write(value ? "true" : "false");
         }
@@ -119,7 +120,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnKeyhole(ref parent);
 
-        if (parent.SuppressKeyholes)
+        if (parent.Type == HtmlType.Raw)
         {
             Writer.Write(value, format);
         }
@@ -146,7 +147,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnColorKeyhole(ref parent, value, format);
 
-        if (parent.SuppressKeyholes)
+        if (parent.Type == HtmlType.Raw)
         {
             Writer.Write(value, format);
         }
@@ -184,12 +185,13 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             // The attribute's value is a combination of string literals and keyholes.
             // So they will be written without any sentinels but we still need to surround it with quotation marks.
             Writer.Write("\""u8);
-            html.Type = HtmlType.Attribute;
+            _isHtmlAnAttribute = true;
         }
         else
         {
             // ex: `<!--key:{Key}-->`
-            Writer.Write("<!--key:"u8, Key, "-->"u8);            
+            Writer.Write("<!--key:"u8, Key, "-->"u8);
+            _isHtmlAnAttribute = false;
         }
 
         return true;
@@ -199,20 +201,18 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnHtmlEnd(ref parent, html, relativeOrder, transition, expression);
 
-        switch (html.Type)
+        if (_isHtmlAnAttribute)
         {
-            case HtmlType.Attribute:
-                // ex: `" key:{Key}`
-                Writer.Write("\" key:"u8);
-                Writer.Write(Key);
-                break;
-
-            default:
-                // ex: `<!--/key:{Key}-->`
-                Writer.Write("<!--/key:"u8, Key, "-->"u8);
-                if (transition is {} trns)
-                    InjectTransition(trns);
-                break;
+            // ex: `" key:{Key}`
+            Writer.Write("\" key:"u8);
+            Writer.Write(Key);
+        }
+        else
+        {
+            // ex: `<!--/key:{Key}-->`
+            Writer.Write("<!--/key:"u8, Key, "-->"u8);
+            if (transition is {} trns)
+                InjectTransition(trns);
         }
 
         return true;

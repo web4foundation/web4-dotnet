@@ -59,12 +59,12 @@ class Keyhole {
   setValue(value) {
     if (this.node.nodeType === Node.TEXT_NODE)
       this.node.nodeValue = value;
-    else if (this.node.nodeType === Node.ELEMENT_NODE)
-      this.setNode(value);
     else if (this.node.nodeType === Node.ATTRIBUTE_NODE && !this.booleanAttributeName)
       this.node.value = value;
-    else
+    else if (this.booleanAttributeName)
       this.node[this.booleanAttributeName] = value;
+    else if (this.node.nodeType === Node.ELEMENT_NODE)
+      this.setNode(value);
   }
 
   setNode(rawHtml, viewTransitionNameNew, viewTransitionNameOld) {
