@@ -368,9 +368,9 @@ public partial class JsonRpcWriter : IDisposable
                     WriteKey(keyhole.Key);
                     _jsonWriter.WriteStringValueSegment("-->", false);
                     break;
-                case KeyholeType.Attribute:
-                    Span<Keyhole> attribute = buffer.AsSpan(keyhole.Sequence);
-                    WriteAttributeSequence(attribute);
+                case KeyholeType.HtmlRaw:
+                    Span<Keyhole> raw = buffer.AsSpan(keyhole.Sequence);
+                    WriteRawSequence(raw);
                     _jsonWriter.WriteStringValueSegment("", true);
                     break;
                 case KeyholeType.EventListener:
@@ -419,7 +419,7 @@ public partial class JsonRpcWriter : IDisposable
         }
     }
 
-    private void WriteAttributeSequence(Span<Keyhole> keyholes)
+    private void WriteRawSequence(Span<Keyhole> keyholes)
     {
         for (int i = 0; i < keyholes.Length; i++)
         {

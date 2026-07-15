@@ -117,7 +117,7 @@ public class SnapshotKeyComposer : BaseKeyComposer
         keyhole.Key = Key;
         keyhole.SequenceStart = _writeHead;
         keyhole.SequenceLength = html.FormattedCount * 2 + 1;
-        keyhole.Type = html.Type == HtmlType.Raw ? KeyholeType.Attribute : KeyholeType.Html;
+        keyhole.Type = html.Type == HtmlType.Raw ? KeyholeType.HtmlRaw : KeyholeType.Html;
         keyhole.RelativeOrder = relativeOrder;
 
         Cursor = _writeHead;

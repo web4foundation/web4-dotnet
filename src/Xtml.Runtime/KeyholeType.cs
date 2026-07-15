@@ -16,8 +16,8 @@ public enum KeyholeType
     TimeOnly,
     Color,
     Uri,
-    Attribute,
     Html,
+    HtmlRaw,
     Iterator,
     EventListener,
 }

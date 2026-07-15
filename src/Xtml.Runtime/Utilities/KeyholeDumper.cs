@@ -74,7 +74,7 @@ public ref struct KeyholeDumper(IConsole Console, Keyhole[] buffer)
                 Console.GroupCollapsed($"{$"[{index}]",-4}  {$"%ckey:{key} %c: %c{keyhole.Type}",-28} {$"%c{{ %c{keyhole.Expression} %c}}"}", CSS_VARIABLE, CSS_OPERATOR, CSS_TYPE, CSS_BRACE, CSS_DEFAULT, CSS_BRACE);
                 Console.GroupEnd();
                 break;
-            case KeyholeType.Attribute:
+            case KeyholeType.HtmlRaw:
                 int start = keyhole.Sequence.Start.Value;
                 int length = keyhole.Sequence.End.Value - start;
                 Console.GroupCollapsed($"{$"[{index}]",-4}  {$"%ckey:{key} %c: %c{keyhole.Type}",-28} %o %cbuffer[{keyhole.Sequence}]", CSS_VARIABLE, CSS_OPERATOR, CSS_TYPE, ObjectString(key), CSS_LINK);

@@ -38,7 +38,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
 
         if (oldSpan.Length != newSpan.Length)
         {
-            if (newParent.Type == KeyholeType.Attribute)
+            if (newParent.Type == KeyholeType.HtmlRaw)
                 mutator.SetValue(
                     newParent.Key,
                     newSpan
@@ -95,7 +95,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
             // (This is especially helpful when the two strings are several kilobytes in length!)
             if (!Object.ReferenceEquals(oldKeyhole.StringLiteral, newKeyhole.StringLiteral))
             {
-                if (newParent.Type == KeyholeType.Attribute)
+                if (newParent.Type == KeyholeType.HtmlRaw)
                     mutator.SetValue(
                         newParent.Key,
                         newSpan
@@ -157,7 +157,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
                 KeyholeType.Iterator =>
                     CompareIterator(ref oldParent, ref newParent, ref oldKeyhole, ref newKeyhole),
                 KeyholeType.Html or
-                KeyholeType.Attribute =>
+                KeyholeType.HtmlRaw =>
                     Recurse(ref oldKeyhole, ref newKeyhole),
                 KeyholeType.EventListener =>
                     false, // Event listeners never need to be diff'd, their only purpose is for lookup.
@@ -179,9 +179,10 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
     {
         if (!Keyhole.Equals(ref oldKeyhole, ref newKeyhole))
         {
-            if (newParent.Type == KeyholeType.Attribute)
+            if (newParent.Type == KeyholeType.HtmlRaw)
             {
-                // This keyhole's value is part of a sequence of keyholes that comprises this attribute.
+                // This keyhole's value is part of a sequence of keyholes that comprises this attribute 
+                // (or raw text element like <title> or <textarea>).
                 // Find the start of this sequence, then grab the sequence's full span.
                 ref var startKeyhole = ref newBuffer[newParent.SequenceStart];
                 mutator.SetValue(newParent.Key, newBuffer.AsSpan(startKeyhole.Sequence));
