@@ -14,7 +14,6 @@ public class SnapshotKeyComposer : BaseKeyComposer
     public static SnapshotKeyComposer Shared => _reusable ??= new SnapshotKeyComposer();
 
     private Keyhole[] _buffer = [];
-    private bool _isWritingAttribute = false;
     private int _writeHead = 0;
     private readonly List<int> _cursors = [0];
     private int Cursor
@@ -74,7 +73,6 @@ public class SnapshotKeyComposer : BaseKeyComposer
         keyhole.Type = KeyholeType.StringLiteral;
         keyhole.SequenceStart = index;
         keyhole.SequenceLength = parent.FormattedCount * 2 + 1;
-        _isWritingAttribute = literal.EndsWith('=');
        
         Cursor = index + 1;
         return true;
@@ -119,7 +117,7 @@ public class SnapshotKeyComposer : BaseKeyComposer
         keyhole.Key = Key;
         keyhole.SequenceStart = _writeHead;
         keyhole.SequenceLength = html.FormattedCount * 2 + 1;
-        keyhole.Type = _isWritingAttribute ? KeyholeType.Attribute : KeyholeType.Html;
+        keyhole.Type = html.SuppressKeyholes ? KeyholeType.Attribute : KeyholeType.Html;
         keyhole.RelativeOrder = relativeOrder;
 
         Cursor = _writeHead;

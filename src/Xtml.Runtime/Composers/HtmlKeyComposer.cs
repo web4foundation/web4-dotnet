@@ -10,8 +10,6 @@ namespace Xtml.Runtime.Composers;
 public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     : BaseKeyComposer, IStreamingComposer
 {
-    private enum KeyholeType { TextNode, AttributeValue, Segment }
-    private KeyholeType _keyholeType = KeyholeType.TextNode;
     private ReadOnlyMemory<char>? _deferredLiteral = null;
     private bool _isHeadOmitted = false;
 
@@ -44,17 +42,10 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
         base.OnMarkup(ref parent, ref literal, relativeOrder);
 
         // This makes the assumption that keyholes preceded with an '=' are always attributes.  
-        // Attributes need different sentinels than regular keyholes and boolean attributes 
-        // have a few strange rules to follow:
-        // https://developer.mozilla.org/en-US/docs/Glossary/Boolean/HTML
         if (literal.EndsWith('='))
-        {
-            _keyholeType = KeyholeType.AttributeValue;
             _deferredLiteral = literal.AsMemory();
-            return true;
-        }
-
-        Writer.Write(literal);
+        else
+            Writer.Write(literal);
 
         return true;
     }
@@ -63,32 +54,24 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnStringKeyhole(ref parent, value);
 
-        switch (_keyholeType)
+        if (parent.SuppressKeyholes)
         {
-            case KeyholeType.TextNode:
-                // ex: `<!--key:{Key}-->{value}<!--/key:{Key}-->`
-                Writer.Write("<!--key:"u8, Key, "-->"u8);
-                Writer.Write(value);
-                Writer.Write("<!--/key:"u8, Key, "-->"u8);
-                break;
-
-            case KeyholeType.AttributeValue:
-                HandleDeferredLiteral();
-                // ex: `"{value}" key:{Key}`
-                Writer.Write("\""u8);
-                Writer.Write(value);
-                Writer.Write("\" key:"u8);
-                Writer.Write(Key);
-                // status jumps from .AttributeValue to .TextNode because the whole 
-                // attribute is just one value, not a bunch of keyholes+literals.
-                _keyholeType = KeyholeType.TextNode;
-                break;
-
-            case KeyholeType.Segment:
-                // No sentinels.  This keyhole is a part of a larger attribute
-                // composed of multiple keyholes+literals.  Write only the value.
-                Writer.Write(value);
-                break;
+            Writer.Write(value);
+        }
+        else if (HandleDeferredLiteral())
+        {
+            // ex: `"{value}" key:{Key}`
+            Writer.Write("\""u8);
+            Writer.Write(value);
+            Writer.Write("\" key:"u8);
+            Writer.Write(Key);
+        }
+        else
+        {
+            // ex: `<!--key:{Key}-->{value}<!--/key:{Key}-->`
+            Writer.Write("<!--key:"u8, Key, "-->"u8);
+            Writer.Write(value);
+            Writer.Write("<!--/key:"u8, Key, "-->"u8);
         }
 
         return true;
@@ -98,40 +81,25 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnBoolKeyhole(ref parent, value);
 
-        switch (_keyholeType)
+        if (parent.SuppressKeyholes)
         {
-            case KeyholeType.TextNode:
-                // ex: `<!--key:{Key}-->{b}<!--/key:{Key}-->`
-                Writer.Write("<!--key:"u8, Key, "-->"u8);
-                Writer.Write(value ? "true" : "false");
-                Writer.Write("<!--/key:"u8, Key, "-->"u8);
-                break;
-
-            case KeyholeType.AttributeValue:
-                var attributeName = HandleDeferredLiteral(isBooleanAttribute: true);
-                if (value)
-                {
-                    // ex: ` {attributeName}`
-                    Writer.Write(" "u8);
-                    Writer.Write(attributeName);
-                }
-                // ex: ` key:{Key}="{attributeName}"`
-                Writer.Write(" key:"u8);
-                Writer.Write(Key);
-                Writer.Write("=\""u8);
-                Writer.Write(attributeName);
-                Writer.Write("\""u8);
-
-                // status jumps from .AttributeValue to .TextNode because the whole 
-                // attribute is just one value, not a bunch of keyholes+literals.
-                _keyholeType = KeyholeType.TextNode;
-                break;
-
-            case KeyholeType.Segment:
-                // No sentinels.  This keyhole is a part of a larger attribute
-                // composed of multiple keyholes+literals.  Write only the value.
-                Writer.Write(value ? "true" : "false");
-                break;
+            Writer.Write(value ? "true" : "false");
+        }
+        else if (HandleDeferredLiteral(value, out var attributeName))
+        {
+            // ex: ` key:{Key}="{attributeName}"`
+            Writer.Write(" key:"u8);
+            Writer.Write(Key);
+            Writer.Write("=\""u8);
+            Writer.Write(attributeName);
+            Writer.Write("\""u8);
+        }
+        else
+        {
+            // ex: `<!--key:{Key}-->{b}<!--/key:{Key}-->`
+            Writer.Write("<!--key:"u8, Key, "-->"u8);
+            Writer.Write(value ? "true" : "false");
+            Writer.Write("<!--/key:"u8, Key, "-->"u8);
         }
 
         return true;
@@ -149,39 +117,26 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     private bool OnUtf8SpanFormattable<T>(ref Html parent, T value, string? format = null)
         where T : struct, IUtf8SpanFormattable
     {
-        // Wraps the mutable value with two comment tags
-        // to separate it from any neighboring text.
-        // At the end of the body an inline script registers them 
-        // because we can't rely on id= or document.getElementById().
-
         base.OnKeyhole(ref parent);
 
-        switch (_keyholeType)
+        if (parent.SuppressKeyholes)
         {
-            case KeyholeType.TextNode:
-                // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
-                Writer.Write("<!--key:"u8, Key, "-->"u8);
-                Writer.Write(value, format);
-                Writer.Write("<!--/key:"u8, Key, "-->"u8);
-                break;
-
-            case KeyholeType.AttributeValue:
-                HandleDeferredLiteral();
-                // ex: `"{value:format}" key:{Key}`
-                Writer.Write("\""u8);
-                Writer.Write(value, format);
-                Writer.Write("\" key:"u8);
-                Writer.Write(Key);
-                // status jumps from .AttributeValue to .TextNode because the whole 
-                // attribute is just one value, not a bunch of keyholes+literals.
-                _keyholeType = KeyholeType.TextNode;
-                break;
-
-            case KeyholeType.Segment:
-                // No sentinels.  This keyhole is a part of a larger attribute
-                // composed of multiple keyholes+literals.  Write only the value.
-                Writer.Write(value, format);
-                break;
+            Writer.Write(value, format);
+        }
+        else if (HandleDeferredLiteral())
+        {
+            // ex: `"{value:format}" key:{Key}`
+            Writer.Write("\""u8);
+            Writer.Write(value, format);
+            Writer.Write("\" key:"u8);
+            Writer.Write(Key);            
+        }
+        else
+        {
+            // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
+            Writer.Write("<!--key:"u8, Key, "-->"u8);
+            Writer.Write(value, format);
+            Writer.Write("<!--/key:"u8, Key, "-->"u8);            
         }
 
         return true;
@@ -191,32 +146,24 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnColorKeyhole(ref parent, value, format);
 
-        switch (_keyholeType)
+        if (parent.SuppressKeyholes)
         {
-            case KeyholeType.TextNode:
-                // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
-                Writer.Write("<!--key:"u8, Key, "-->"u8);
-                Writer.Write(value, format);
-                Writer.Write("<!--/key:"u8, Key, "-->"u8);
-                break;
-
-            case KeyholeType.AttributeValue:
-                HandleDeferredLiteral();
-                // ex: `"{value:format}" key:{Key}`
-                Writer.Write("\""u8);
-                Writer.Write(value, format);
-                Writer.Write("\" key:"u8);
-                Writer.Write(Key);
-                // status jumps from .AttributeValue to .TextNode because the whole 
-                // attribute is just one value, not a bunch of keyholes+literals.
-                _keyholeType = KeyholeType.TextNode;
-                break;
-
-            case KeyholeType.Segment:
-                // No sentinels.  This keyhole is a part of a larger attribute
-                // composed of multiple keyholes+literals.  Write only the value.
-                Writer.Write(value, format);
-                break;
+            Writer.Write(value, format);
+        }
+        else if (HandleDeferredLiteral())
+        {
+            // ex: `"{value:format}" key:{Key}`
+            Writer.Write("\""u8);
+            Writer.Write(value, format);
+            Writer.Write("\" key:"u8);
+            Writer.Write(Key);
+        }
+        else
+        {
+            // ex: `<!--key:{Key}-->{value:format}<!--/key:{Key}-->`
+            Writer.Write("<!--key:"u8, Key, "-->"u8);
+            Writer.Write(value, format);
+            Writer.Write("<!--/key:"u8, Key, "-->"u8);
         }
 
         return true;
@@ -229,18 +176,20 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnHtmlBegin(ref html, relativeOrder);
 
-        switch (_keyholeType)
+        // TODO: An attribute sequence or a raw tag might have a child HTML from an <if> tag
+        // and therefore needs to somehow consider SuppressKeyholes... but there's no access to parent???
+
+        if (HandleDeferredLiteral())
         {
-            case KeyholeType.TextNode:
-                // ex: `<!--key:{Key}-->`
-                Writer.Write("<!--key:"u8, Key, "-->"u8);
-                break;
-            case KeyholeType.AttributeValue:
-                HandleDeferredLiteral();
-                // ex: `"` (the value will come later in the next On*Keyhole())
-                Writer.Write("\""u8);
-                _keyholeType = KeyholeType.Segment;
-                break;
+            // The attribute's value is a combination of string literals and keyholes.
+            // So they will be written without any sentinels but we still need to surround it with quotation marks.
+            Writer.Write("\""u8);
+            html.Type = HtmlType.Attribute;
+        }
+        else
+        {
+            // ex: `<!--key:{Key}-->`
+            Writer.Write("<!--key:"u8, Key, "-->"u8);            
         }
 
         return true;
@@ -250,24 +199,20 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnHtmlEnd(ref parent, html, relativeOrder, transition, expression);
 
-        switch (_keyholeType)
+        switch (html.Type)
         {
-            case KeyholeType.TextNode:
+            case HtmlType.Attribute:
+                // ex: `" key:{Key}`
+                Writer.Write("\" key:"u8);
+                Writer.Write(Key);
+                break;
+
+            default:
                 // ex: `<!--/key:{Key}-->`
                 Writer.Write("<!--/key:"u8, Key, "-->"u8);
                 if (transition is {} trns)
                     InjectTransition(trns);
                 break;
-
-            case KeyholeType.Segment:
-                // ex: `" key:{Key}`
-                Writer.Write("\" key:"u8);
-                Writer.Write(Key);
-                _keyholeType = KeyholeType.TextNode;
-                break;
-
-            case KeyholeType.AttributeValue:
-                throw new NotSupportedException("Attributes cannot have nested Htmls");
         }
 
         return true;
@@ -298,8 +243,7 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         base.OnKeyhole(ref parent);
 
-        if (_deferredLiteral != null)
-            HandleDeferredLiteral();
+        HandleDeferredLiteral();
 
         if (!includeEventArg)
         {
@@ -327,43 +271,57 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             Writer.Write("'].dispatchEvent(event,'*')\" key:"u8);
             Writer.Write(Key);
         }
-        
-        _keyholeType = KeyholeType.TextNode;
+
         return true;
     }
 
-    private void HandleDeferredLiteral()
+    private bool HandleDeferredLiteral()
     {
         if (!_deferredLiteral.HasValue)
-            throw new NullReferenceException(nameof(_deferredLiteral));
+            return false;
 
         Writer.Write(_deferredLiteral.Value);
+
         _deferredLiteral = null;
+        return true;
     }
 
-    private ReadOnlySpan<char> HandleDeferredLiteral(bool isBooleanAttribute = true)
+    /// <summary>
+    /// This overload is specifically for boolean attributes and is responsible for the complicated logic regarding deferred literals.
+    /// HTML has some quirky rules around boolean attributes that don't follow the normal `key="value"` pattern.
+    /// https://developer.mozilla.org/en-US/docs/Glossary/Boolean/HTML
+    /// Hence the reason to defer writing the literal until we see if the next keyhole will be a boolean.
+    /// If so, and if the value is false, then the attribute name needs to NOT be written.
+    /// But the keyhole's key still needs to be written.
+    /// The prior string literal will look something like `...<input type="checkbox" checked=`
+    /// Note: We know they always end with `=`.
+    /// </summary>
+    /// <param name="value">The value of the boolean attribute.</param>
+    /// <param name="attributeName">The name of the boolean attribute.</param>
+    /// <returns></returns>
+    private bool HandleDeferredLiteral(bool value, out ReadOnlySpan<char> attributeName)
     {
-        if (!isBooleanAttribute)
+        if (!_deferredLiteral.HasValue)
         {
-            HandleDeferredLiteral();
-            return [];
+            attributeName = [];
+            return false;
         }
 
-        if (!_deferredLiteral.HasValue)
-            throw new NullReferenceException(nameof(_deferredLiteral));
+        var span = _deferredLiteral.Value.Span;
+        int indexBeforeAttribute = span.LastIndexOf(' ');
 
-        // This string literal will look something like `...<input type="checkbox" checked=`
-        // Note: We know they always end with `=`.
-        var deferredLiteralSpan = _deferredLiteral.Value.Span;
-        int indexBeforeAttribute = deferredLiteralSpan.LastIndexOf(' ');
         ArgumentOutOfRangeException.ThrowIfLessThan(indexBeforeAttribute, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(indexBeforeAttribute, deferredLiteralSpan.Length - 2);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(indexBeforeAttribute, span.Length - 2);
 
-        Writer.Write(deferredLiteralSpan[..indexBeforeAttribute]);
-        var attributeName = deferredLiteralSpan[(indexBeforeAttribute + 1)..^1];
-
+        if (value)
+            Writer.Write(span[..^1]); // Writes the whole literal which includes the attribute name up to the equals sign.
+        else
+            Writer.Write(span[..indexBeforeAttribute]); // Writes the literal but excludes the attribute name and equals sign
+            
+        attributeName = span[(indexBeforeAttribute + 1)..^1];
         _deferredLiteral = null;
-        return attributeName;
+
+        return true;
     }
 
     private void InjectKernel(ref string literal)
@@ -427,16 +385,12 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
             // Then set `literal` to "" so the next OnMarkup no-ops.
             int offset = _isHeadOmitted ? 0 : headIndex;
             if (literal.EndsWith('='))
-            {
-                _keyholeType = KeyholeType.AttributeValue;
                 _deferredLiteral = literal.AsMemory(offset);
-            }
             else
-            {
                 Writer.Write(literal.AsSpan(offset));
-            }
         }
 
+        // Clear the literal since we've already written it out, and we don't want it to be written again by the next OnMarkup.
         literal = string.Empty;
     }
 
@@ -460,7 +414,6 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
     {
         Writer = null!;
         Window = null!;
-        _keyholeType = KeyholeType.TextNode;
         base.Reset();
     }
 

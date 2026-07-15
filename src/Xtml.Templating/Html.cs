@@ -6,7 +6,7 @@ using Xtml.Dom;
 
 namespace Xtml.Templating;
 
-public enum HtmlType { Node, Template, Wrapper }
+public enum HtmlType { Wrapper, Template, Node, Attribute }
 
 [InterpolatedStringHandler]
 [StructLayout(LayoutKind.Auto)]
@@ -17,6 +17,7 @@ public ref partial struct Html : IDisposable
 
     public int FormattedCount { get; private set; }
     public HtmlType Type { get; set; }
+    public bool SuppressKeyholes { get; set; } = false;
 
     /// <summary>
     /// --- ROOT Html ---
@@ -55,6 +56,7 @@ public ref partial struct Html : IDisposable
         : this(parentHtml._composer, literalLength, formattedCount)
     {
         @continue = true;
+        SuppressKeyholes = true;
     }
 
     private Html(BaseComposer composer, int literalLength, int formattedCount)
