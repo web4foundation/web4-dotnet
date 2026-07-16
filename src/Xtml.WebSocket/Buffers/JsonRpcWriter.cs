@@ -371,7 +371,6 @@ public partial class JsonRpcWriter : IDisposable
                 case KeyholeType.HtmlRaw:
                     Span<Keyhole> raw = buffer.AsSpan(keyhole.Sequence);
                     WriteRawSequence(raw);
-                    _jsonWriter.WriteStringValueSegment("", true);
                     break;
                 case KeyholeType.EventListener:
                     _jsonWriter.WriteStringValueSegment("\"keyholes['", false);
