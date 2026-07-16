@@ -21,9 +21,9 @@ public abstract class BaseKeyComposer : BaseComposer
     public virtual bool OnTemplateEnd(ref Html html) => true;
 
     public override bool OnMarkup(ref Html parent, ref string literal, int relativeOrder = -1) => (_isHtmlPrepared, parent.Type) switch {
+        (true, _) => true,
         (false, HtmlType.Template) => _isHtmlPrepared = OnTemplateBegin(ref parent, ref literal),
-        (false, HtmlType.Node or HtmlType.Raw) => _isHtmlPrepared = OnHtmlBegin(ref parent, relativeOrder),
-        _ => true,
+        (false, _) => _isHtmlPrepared = OnHtmlBegin(ref parent, relativeOrder),
     };
 
     public override bool OnStringKeyhole(ref Html parent, string value) => OnKeyhole(ref parent);
@@ -94,9 +94,9 @@ public abstract class BaseKeyComposer : BaseComposer
     {
         var discard = string.Empty;
         _ = (_isHtmlPrepared, parent.Type) switch {
+            (true, _) => true,
             (false, HtmlType.Template) => _isHtmlPrepared = OnTemplateBegin(ref parent, ref discard),
-            (false, HtmlType.Node or HtmlType.Raw) => _isHtmlPrepared = OnHtmlBegin(ref parent),
-            _ => true,
+            (false, _) => _isHtmlPrepared = OnHtmlBegin(ref parent),
         };
 
         Key = _keyCursor.MoveNext();

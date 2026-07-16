@@ -6,7 +6,7 @@ using Xtml.Dom;
 
 namespace Xtml.Templating;
 
-public enum HtmlType { Wrapper, Template, Node, Raw }
+public enum HtmlType { Wrapper, Template, Node, Raw, Attribute }
 
 [InterpolatedStringHandler]
 [StructLayout(LayoutKind.Auto)]
