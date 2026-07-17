@@ -343,148 +343,6 @@ public partial class JsonRpcWriter : IDisposable
         OnMessageEnd();
     }
 
-    private void WriteOpenKeyTag(byte[] key)
-    {
-        _jsonWriter.WriteStringValueSegment("<!--key:", false);
-        WriteKey(key);
-        _jsonWriter.WriteStringValueSegment("-->", false);
-    }
-
-    private void WriteCloseKeyTag(byte[] key)
-    {
-        _jsonWriter.WriteStringValueSegment("<!--/key:", false);
-        WriteKey(key);
-        _jsonWriter.WriteStringValueSegment("-->", false);
-    }
-
-    private void WriteVoidKeyTag(byte[] key)
-    {
-        _jsonWriter.WriteStringValueSegment("<!--key:", false);
-        WriteKey(key);
-        _jsonWriter.WriteStringValueSegment(" /-->", false);
-    }
-
-    private void WriteKey(byte[] key)
-    {
-        _jsonWriter.Flush();
-        key.CopyTo(_bufferWriter.GetSpan(key.Length));
-        _bufferWriter.Advance(key.Length);
-    }
-
-    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes, bool isAttribute = false)
-    {
-        for (int i = 0; i < keyholes.Length; i++)
-        {
-            ref var keyhole = ref keyholes[i];
-
-            switch (keyhole.Type)
-            {
-                case KeyholeType.StringLiteral:
-                    _jsonWriter.WriteStringValueSegment(keyhole.StringLiteral, false);
-                    isAttribute = keyhole.StringLiteral?.EndsWith('=') ?? false;
-                    break;
-                case KeyholeType.Html:
-                    WriteOpenKeyTag(keyhole.Key);
-                    WriteHtml(buffer, buffer.AsSpan(keyhole.Sequence), isAttribute);
-                    WriteCloseKeyTag(keyhole.Key);
-                    InjectTransition(keyhole.Key, keyhole.FormatModifier);
-                    break;
-                case KeyholeType.HtmlRaw:
-                    if (isAttribute)
-                    {
-                        _jsonWriter.WriteStringValueSegment("\"", false);
-                    }
-                    else
-                    {
-                        WriteOpenKeyTag(keyhole.Key);
-                    }
-                    Span<Keyhole> raw = buffer.AsSpan(keyhole.Sequence);
-                    WriteRawSequence(raw);
-                    if (isAttribute)
-                    {
-                        _jsonWriter.WriteStringValueSegment("\" key:", false);
-                        WriteKey(keyhole.Key);
-                    }
-                    else
-                    {
-                        WriteCloseKeyTag(keyhole.Key);
-                    }
-                    break;
-                case KeyholeType.EventListener:
-                    _jsonWriter.WriteStringValueSegment("\"keyholes['", false);
-                    WriteKey(keyhole.Key);
-                    switch (keyhole.TrimModifier)
-                    {
-                        case "":
-                            _jsonWriter.WriteStringValueSegment("'].dispatchEvent(event)\" key:", false);
-                            break;
-                        case null:
-                        default:
-                            _jsonWriter.WriteStringValueSegment("'].dispatchEvent(event,'", false);
-                            _jsonWriter.WriteStringValueSegment(keyhole.TrimModifier ?? "*", false);
-                            _jsonWriter.WriteStringValueSegment("')\" key:", false);
-                            break;
-                    }
-                    WriteKey(keyhole.Key);
-                    break;
-                case KeyholeType.Iterator:
-                    int start = keyhole.Sequence.Start.Value;
-                    int end = keyhole.Sequence.End.Value;
-                    for (int i2 = start+1; i2 < end; i2+=2)
-                    {
-                        ref var k = ref buffer[i2];
-                        WriteOpenKeyTag(k.Key);
-                        WriteHtml(buffer, buffer.AsSpan(k.Sequence), isAttribute);
-                        WriteCloseKeyTag(k.Key);
-                    }
-                    WriteVoidKeyTag(keyhole.Key);
-                    break;
-                // The rest are the mutable keyhole values.  They might use format strings.
-                default:
-                    if (isAttribute)
-                    {
-                        _jsonWriter.WriteStringValueSegment("\"", false);
-                    }
-                    else
-                    {
-                        WriteOpenKeyTag(keyhole.Key);
-                    }
-
-                    WriteMutableKeyholeValue(ref keyhole);
-
-                    if (isAttribute)
-                    {
-                        _jsonWriter.WriteStringValueSegment("\" key:", false);
-                        WriteKey(keyhole.Key);
-                    }
-                    else
-                    {
-                        WriteCloseKeyTag(keyhole.Key);
-                    }
-                    break;
-            }
-        }
-    }
-
-    private void WriteRawSequence(Span<Keyhole> keyholes)
-    {
-        for (int i = 0; i < keyholes.Length; i++)
-        {
-            ref var keyhole = ref keyholes[i];
-
-            switch (keyhole.Type)
-            {
-                case KeyholeType.StringLiteral:
-                    _jsonWriter.WriteStringValueSegment(keyhole.StringLiteral, false);
-                    break;
-                // The rest are the mutable keyhole values.  They might use format strings.
-                default:
-                    WriteMutableKeyholeValue(ref keyhole);
-                    break;
-            }
-        }
-    }
-
     public void WriteRequest(int id)
     {
         // TODO: Implement
@@ -517,6 +375,133 @@ public partial class JsonRpcWriter : IDisposable
         _jsonWriter.Flush();
 
         OnMessageEnd();
+    }
+    
+    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes, bool isAttribute = false)
+    {
+        for (int i = 0; i < keyholes.Length; i++)
+        {
+            ref var keyhole = ref keyholes[i];
+
+            switch (keyhole.Type)
+            {
+                case KeyholeType.StringLiteral:
+                    _jsonWriter.WriteStringValueSegment(keyhole.StringLiteral, false);
+                    isAttribute = keyhole.StringLiteral?.EndsWith('=') ?? false;
+                    break;
+                case KeyholeType.Html:
+                    WriteOpenSentinel(keyhole.Key);
+                    WriteHtml(buffer, buffer.AsSpan(keyhole.Sequence), isAttribute);
+                    WriteCloseSentinel(keyhole.Key);
+                    WriteTransition(keyhole.Key, keyhole.FormatModifier);
+                    break;
+                case KeyholeType.HtmlRaw:
+                    WriteOpenSentinel(keyhole.Key, isAttribute);
+                    WriteRawSequence(buffer.AsSpan(keyhole.Sequence));
+                    WriteCloseSentinel(keyhole.Key, isAttribute);
+                    break;
+                case KeyholeType.EventListener:
+                    WriteListener(keyhole.Key, keyhole.TrimModifier);
+                    break;
+                case KeyholeType.Iterator:
+                    int start = keyhole.Sequence.Start.Value;
+                    int end = keyhole.Sequence.End.Value;
+                    for (int i2 = start + 1; i2 < end; i2 += 2)
+                    {
+                        ref var k = ref buffer[i2];
+                        WriteOpenSentinel(k.Key);
+                        WriteHtml(buffer, buffer.AsSpan(k.Sequence), isAttribute);
+                        WriteCloseSentinel(k.Key);
+                    }
+                    WriteVoidSentinel(keyhole.Key);
+                    break;
+                // The rest are the mutable keyhole values.  They might use format strings.
+                default:
+                    WriteOpenSentinel(keyhole.Key, isAttribute);
+                    WriteMutableKeyholeValue(ref keyhole);
+                    WriteCloseSentinel(keyhole.Key, isAttribute);
+                    break;
+            }
+        }
+    }
+
+    private void WriteListener(byte[] key, string? trim)
+    {
+        _jsonWriter.WriteStringValueSegment("\"keyholes['", false);
+        WriteKey(key);
+        if (trim == string.Empty)
+        {
+            _jsonWriter.WriteStringValueSegment("'].dispatchEvent(event)\" key:", false);
+        }
+        else
+        {
+            _jsonWriter.WriteStringValueSegment("'].dispatchEvent(event,'", false);
+            _jsonWriter.WriteStringValueSegment(trim ?? "*", false);
+            _jsonWriter.WriteStringValueSegment("')\" key:", false);
+        }
+        WriteKey(key);
+    }
+
+    private void WriteRawSequence(Span<Keyhole> keyholes)
+    {
+        for (int i = 0; i < keyholes.Length; i++)
+        {
+            ref var keyhole = ref keyholes[i];
+
+            switch (keyhole.Type)
+            {
+                case KeyholeType.StringLiteral:
+                    _jsonWriter.WriteStringValueSegment(keyhole.StringLiteral, false);
+                    break;
+                // The rest are the mutable keyhole values.  They might use format strings.
+                default:
+                    WriteMutableKeyholeValue(ref keyhole);
+                    break;
+            }
+        }
+    }
+
+    private void WriteOpenSentinel(byte[] key, bool isAttribute = false)
+    {
+        if (isAttribute)
+        {
+            _jsonWriter.WriteStringValueSegment("\"", false);
+        }
+        else
+        {
+            _jsonWriter.WriteStringValueSegment("<!--key:", false);
+            WriteKey(key);
+            _jsonWriter.WriteStringValueSegment("-->", false);
+        }
+    }
+
+    private void WriteCloseSentinel(byte[] key, bool isAttribute = false)
+    {
+        if (isAttribute)
+        {
+            _jsonWriter.WriteStringValueSegment("\" key:", false);
+            WriteKey(key);
+        }
+        else
+        {
+            _jsonWriter.WriteStringValueSegment("<!--/key:", false);
+            WriteKey(key);
+            _jsonWriter.WriteStringValueSegment("-->", false);
+        }
+    }
+
+    private void WriteVoidSentinel(byte[] key)
+    {
+        _jsonWriter.WriteStringValueSegment("<!--key:", false);
+        WriteKey(key);
+        _jsonWriter.WriteStringValueSegment(" /-->", false);
+    }
+
+    private void WriteKey(byte[] key)
+    {
+        _jsonWriter.Flush();
+        key.CopyTo(_bufferWriter.GetSpan(key.Length));
+        _bufferWriter.Advance(key.Length);
     }
 
     private void OnMessageBegin()
@@ -629,7 +614,7 @@ public partial class JsonRpcWriter : IDisposable
             throw new NotSupportedException("🛑 It seems a keyhole value with a format string needed a buffer > 1MB.  Probably misuse?  Needs investigation.");
     }
 
-    private void InjectTransition(byte[] parentKey, string? transition)
+    private void WriteTransition(byte[] parentKey, string? transition)
     {
         if (transition is null)
             return;
