@@ -373,6 +373,9 @@ public partial class JsonRpcWriter : IDisposable
                     _jsonWriter.WriteStringValueSegment("<!--/key:", false);
                     WriteKey(keyhole.Key);
                     _jsonWriter.WriteStringValueSegment("-->", false);
+
+                    if (keyhole.FormatModifier is {} trns)
+                        InjectTransition(keyhole.Key, trns);
                     break;
                 case KeyholeType.HtmlRaw:
                     if (isAttribute)
@@ -629,6 +632,25 @@ public partial class JsonRpcWriter : IDisposable
         sizeHint *= 2;
         if (sizeHint > (2 << 20)) // 1MB
             throw new NotSupportedException("🛑 It seems a keyhole value with a format string needed a buffer > 1MB.  Probably misuse?  Needs investigation.");
+    }
+
+    private void InjectTransition(byte[] parentKey, string transition)
+    {
+        Span<byte> key = stackalloc byte[parentKey.Length];
+        for (int i = 0; i < key.Length; i++)
+            key[i] = parentKey[i] == ':' ? (byte)'-' : parentKey[i];
+        
+        // TODO: Many allocations below.
+        string k = System.Text.Encoding.UTF8.GetString(key);
+        _jsonWriter.WriteStringValueSegment($$"""
+            <style>
+                ::view-transition-group(xtml-fwd-{{k}}, xtml-rev-{{k}}) { animation: none; }
+                ::view-transition-new(xtml-fwd-{{k}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in; }
+                ::view-transition-old(xtml-fwd-{{k}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out; }
+                ::view-transition-new(xtml-rev-{{k}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-out reverse; }
+                ::view-transition-old(xtml-rev-{{k}}) { width: auto; height: auto; animation: 300ms ease-in-out {{transition}}-in reverse; }
+            </style>
+            """, false);
     }
 
     public void Dispose()
