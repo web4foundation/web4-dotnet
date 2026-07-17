@@ -10,8 +10,6 @@ public class SnapshotKeyComposer : BaseKeyComposer
 {
     // TODO: Don't forget to implement the high watermark logic.
     private static int _highWaterMark = 2048;
-    [ThreadStatic] static SnapshotKeyComposer? _reusable;
-    public static SnapshotKeyComposer Shared => _reusable ??= new SnapshotKeyComposer();
 
     private Keyhole[] _buffer = [];
     private int _writeHead = 0;
@@ -235,4 +233,7 @@ public class SnapshotKeyComposer : BaseKeyComposer
             Cursor = index + 1;
         }
     }
+
+    [ThreadStatic] static SnapshotKeyComposer? _reusable;
+    public static SnapshotKeyComposer Shared => _reusable ??= new SnapshotKeyComposer();
 }
