@@ -377,8 +377,10 @@ public partial class JsonRpcWriter : IDisposable
         OnMessageEnd();
     }
     
-    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes, bool isAttribute = false)
+    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes)
     {
+        bool isAttribute = false;
+
         for (int i = 0; i < keyholes.Length; i++)
         {
             ref var keyhole = ref keyholes[i];
@@ -391,7 +393,7 @@ public partial class JsonRpcWriter : IDisposable
                     break;
                 case KeyholeType.Html:
                     WriteOpenSentinel(keyhole.Key);
-                    WriteHtml(buffer, buffer.AsSpan(keyhole.Sequence), isAttribute);
+                    WriteHtml(buffer, buffer.AsSpan(keyhole.Sequence));
                     WriteCloseSentinel(keyhole.Key);
                     WriteTransition(keyhole.Key, keyhole.FormatModifier);
                     break;
@@ -410,7 +412,7 @@ public partial class JsonRpcWriter : IDisposable
                     {
                         ref var k = ref buffer[i2];
                         WriteOpenSentinel(k.Key);
-                        WriteHtml(buffer, buffer.AsSpan(k.Sequence), isAttribute);
+                        WriteHtml(buffer, buffer.AsSpan(k.Sequence));
                         WriteCloseSentinel(k.Key);
                     }
                     WriteVoidSentinel(keyhole.Key);
