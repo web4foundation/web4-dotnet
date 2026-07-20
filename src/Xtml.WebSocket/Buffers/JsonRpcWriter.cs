@@ -379,18 +379,14 @@ public partial class JsonRpcWriter : IDisposable
     
     private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes)
     {
-        bool isAttribute = false;
-
-        for (int i = 0; i < keyholes.Length; i++)
+        for (int i = 1; i < keyholes.Length; i += 2)
         {
+            ref var literal = ref keyholes[i - 1];
             ref var keyhole = ref keyholes[i];
+            bool isAttribute = WriteStringLiteral(ref literal, ref keyhole, out var attributeName);
 
             switch (keyhole.Type)
             {
-                case KeyholeType.StringLiteral:
-                    _jsonWriter.WriteStringValueSegment(keyhole.StringLiteral, false);
-                    isAttribute = keyhole.StringLiteral?.EndsWith('=') ?? false;
-                    break;
                 case KeyholeType.Html:
                     WriteOpenSentinel(keyhole.Key);
                     WriteHtml(buffer, buffer.AsSpan(keyhole.Sequence));
@@ -419,12 +415,52 @@ public partial class JsonRpcWriter : IDisposable
                     break;
                 // The rest are the mutable keyhole values.  They might use format strings.
                 default:
-                    WriteOpenSentinel(keyhole.Key, isAttribute);
-                    WriteMutableKeyholeValue(ref keyhole);
-                    WriteCloseSentinel(keyhole.Key, isAttribute);
+                    if (isAttribute && keyhole.Type == KeyholeType.Boolean)
+                    {
+                        // Booleans are "special" (see WriteStringLiteral).
+                        _jsonWriter.WriteStringValueSegment(" key:", false);
+                        WriteKey(keyhole.Key);
+                        _jsonWriter.WriteStringValueSegment("=\"", false);
+                        _jsonWriter.WriteStringValueSegment(attributeName, false);
+                        _jsonWriter.WriteStringValueSegment("\"", false);
+                    }
+                    else
+                    {
+                        WriteOpenSentinel(keyhole.Key, isAttribute);
+                        WriteMutableKeyholeValue(ref keyhole);
+                        WriteCloseSentinel(keyhole.Key, isAttribute);
+                    }
                     break;
             }
         }
+
+        ref var lastLiteral = ref keyholes[^1];
+        _jsonWriter.WriteStringValueSegment(lastLiteral.StringLiteral, false);
+    }
+
+    private bool WriteStringLiteral(ref Keyhole literal, ref Keyhole keyhole, out ReadOnlySpan<char> attributeName)
+    {
+        var isAttribute = literal.StringLiteral?.EndsWith('=') ?? false;
+        if (!isAttribute || keyhole.Type != KeyholeType.Boolean)
+        {
+            _jsonWriter.WriteStringValueSegment(literal.StringLiteral, false);
+            attributeName = default;
+            return isAttribute;
+        }
+
+        // Boolean attributes are "special".  
+        // For example <input checked="false" /> means checked is true.  🤦
+        // The only way to make a boolean attribute false is to omit it entirely.
+        var span = literal.StringLiteral.AsSpan();
+        int indexBeforeAttribute = span.LastIndexOf(' ');
+
+        if (keyhole.Boolean)
+            _jsonWriter.WriteStringValueSegment(span[..^1], false); // Writes the whole literal which includes the attribute name up to the equals sign.
+        else
+            _jsonWriter.WriteStringValueSegment(span[..indexBeforeAttribute], false); // Writes the literal but excludes the attribute name and equals sign
+            
+        attributeName = span[(indexBeforeAttribute + 1)..^1];
+        return true;
     }
 
     private void WriteListener(byte[] key, string? trim)
