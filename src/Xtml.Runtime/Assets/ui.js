@@ -131,7 +131,7 @@ class Keyhole {
       newDoc.head.registerKeyholes('head');
       document.head.replaceWith(newDoc.head);
       if (!window["_hot_reload_warning"]) {
-        console.warn("The root template has been modified so <head> and <body> must be replaced.  This is only possible in DEBUG mode.");
+        console.warn("The root template string literals have been modified at runtime so <head> and <body> must be replaced.  This never happens in production.  It's a DEBUG-only feature.");
         window["_hot_reload_warning"] = true;
       }
       return newDoc.body;
