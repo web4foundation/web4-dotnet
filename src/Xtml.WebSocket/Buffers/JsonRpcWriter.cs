@@ -417,12 +417,9 @@ public partial class JsonRpcWriter : IDisposable
                 default:
                     if (isAttribute && keyhole.Type == KeyholeType.Boolean)
                     {
-                        // Booleans are "special" (see WriteStringLiteral).
-                        _jsonWriter.WriteStringValueSegment(" key:", false);
-                        WriteKey(keyhole.Key);
-                        _jsonWriter.WriteStringValueSegment("=\"", false);
-                        _jsonWriter.WriteStringValueSegment(attributeName, false);
-                        _jsonWriter.WriteStringValueSegment("\"", false);
+                        // Boolean attributes have no opening sentinel and their value 
+                        // is written as a part of the prior string literal for the sake of performance.
+                        WriteCloseSentinel(keyhole.Key, attributeName);
                     }
                     else
                     {
@@ -526,6 +523,16 @@ public partial class JsonRpcWriter : IDisposable
             WriteKey(key);
             _jsonWriter.WriteStringValueSegment("-->", false);
         }
+    }
+
+    private void WriteCloseSentinel(byte[] key, ReadOnlySpan<char> booleanAttributeName)
+    {
+        // Booleans are "special" (see WriteStringLiteral).
+        _jsonWriter.WriteStringValueSegment(" key:", false);
+        WriteKey(key);
+        _jsonWriter.WriteStringValueSegment("=\"", false);
+        _jsonWriter.WriteStringValueSegment(booleanAttributeName, false);
+        _jsonWriter.WriteStringValueSegment("\"", false);
     }
 
     private void WriteVoidSentinel(byte[] key)
