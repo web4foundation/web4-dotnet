@@ -706,17 +706,19 @@ public partial class JsonRpcWriter : IDisposable
     #if DEBUG
     private bool InjectKernel(ref string literal)
     {
-        // NOTE! This only ever runs in DEBUG mode. Memory allocations are acceptable.
+        // NOTE! This only ever runs in DEBUG mode.
 
         int headIndex = literal.IndexOf("<head>", StringComparison.Ordinal);
         bool isHeadOmitted = headIndex < 0;
         headIndex += 6;
 
-        string injected = isHeadOmitted
-            ? "<!doctype html><html><head>"
-            : literal[..headIndex];
+        _jsonWriter.WriteStringValueSegment(
+            isHeadOmitted 
+                ? "<!doctype html><html><head>" 
+                : literal[..headIndex], 
+            false);
         
-        injected += """
+        _jsonWriter.WriteStringValueSegment("""
 
                 <!-- Injected by XTML -->
                 <script src="/_app/websocket/ui.js" defer></script>
@@ -724,25 +726,23 @@ public partial class JsonRpcWriter : IDisposable
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
                 <meta charset="UTF-8">
 
-        """;
+        """, false);
 
         // Write event handlers set on window or document
         if (_windowBuilder?.Listeners.Count > 0)
         {
-            injected += "\n\n<script>\n";
+            _jsonWriter.WriteStringValueSegment("\n\n<script>\n", false);
 
             foreach (var listener in _windowBuilder.Listeners)
-                injected += $"  {listener.Html ?? ""}\n";
+                _jsonWriter.WriteStringValueSegment($"  {listener.Html ?? ""}\n", false);
 
-            injected += "</script>\n\n";
+            _jsonWriter.WriteStringValueSegment("</script>\n\n", false);
         }
 
         if (isHeadOmitted)
-            injected += "</head><body>";
+            _jsonWriter.WriteStringValueSegment("</head><body>", false);
         else
             literal = literal[headIndex..];
-        
-        _jsonWriter.WriteStringValueSegment(injected, false);
 
         return isHeadOmitted;
     }
