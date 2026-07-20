@@ -46,7 +46,7 @@ public ref struct Reconciler(IRpcClient mutator, Keyhole[] oldBuffer, Keyhole[] 
             else if (newParent.TransitionModifier is null)
                 mutator.SetNode(
                     newBuffer,
-                    newParent.Key,
+                    newParent.Key ?? ROOT_KEY, // Only HotReload can change the root string literal.,
                     newSpan
                 );
             else
