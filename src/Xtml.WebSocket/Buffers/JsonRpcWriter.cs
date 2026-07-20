@@ -450,12 +450,11 @@ public partial class JsonRpcWriter : IDisposable
         // The only way to make a boolean attribute false is to omit it entirely.
         var span = literal.StringLiteral.AsSpan();
         int indexBeforeAttribute = span.LastIndexOf(' ');
-
-        if (keyhole.Boolean)
-            _jsonWriter.WriteStringValueSegment(span[..^1], false); // Writes the whole literal which includes the attribute name up to the equals sign.
-        else
-            _jsonWriter.WriteStringValueSegment(span[..indexBeforeAttribute], false); // Writes the literal but excludes the attribute name and equals sign
-            
+        _jsonWriter.WriteStringValueSegment(
+            keyhole.Boolean 
+                ? span[..^1] // Writes the whole literal which includes the attribute name up to the equals sign.
+                : span[..indexBeforeAttribute], // Writes the literal but excludes the attribute name and equals sign
+            false);
         attributeName = span[(indexBeforeAttribute + 1)..^1];
         return true;
     }
