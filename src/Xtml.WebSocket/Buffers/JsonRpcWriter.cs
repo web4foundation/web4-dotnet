@@ -19,6 +19,7 @@ public partial class JsonRpcWriter : IDisposable
     private ChannelWriter<ReadOnlySequence<byte>>? _flusher = null;
     private FlushOnAwait? _flushOnAwait;
     private bool _isBatch = false;
+    private WindowBuilder? _windowBuilder;
 
     private JsonRpcWriter()
     {
@@ -26,10 +27,11 @@ public partial class JsonRpcWriter : IDisposable
         _jsonWriter = new(_bufferWriter, options);
     }
 
-    public static JsonRpcWriter Current(ChannelWriter<ReadOnlySequence<byte>> flusher)
+    public static JsonRpcWriter Current(ChannelWriter<ReadOnlySequence<byte>> flusher, WindowBuilder? windowBuilder = null)
     {
         var writer = _threadStaticWriter ??= new();
         writer._flusher = flusher;
+        writer._windowBuilder = windowBuilder;
 
         if (SynchronizationContext.Current is FlushOnAwait)
             writer._isBatch = true;
@@ -723,6 +725,17 @@ public partial class JsonRpcWriter : IDisposable
                 <meta charset="UTF-8">
 
         """;
+
+        // Write event handlers set on window or document
+        if (_windowBuilder?.Listeners.Count > 0)
+        {
+            injected += "\n\n<script>\n";
+
+            foreach (var listener in _windowBuilder.Listeners)
+                injected += $"  {listener.Html ?? ""}\n";
+
+            injected += "</script>\n\n";
+        }
 
         if (isHeadOmitted)
             injected += "</head><body>";

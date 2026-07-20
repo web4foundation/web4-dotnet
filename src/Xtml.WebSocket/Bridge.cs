@@ -27,7 +27,7 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
     private TimeSpan _diffInterval = TimeSpan.FromMilliseconds(1000d / 60d); // 60fps
     private readonly Channel<int> _diffChannel = CreateDiffChannel();
     private readonly Channel<ReadOnlySequence<byte>> _outputChannel = CreateOutputChannel();
-    private JsonRpcWriter JsonRpc => JsonRpcWriter.Current(_outputChannel.Writer);
+    private JsonRpcWriter JsonRpc => JsonRpcWriter.Current(_outputChannel.Writer, windowBuilder);
 
     #if DEBUG
     static Bridge()
