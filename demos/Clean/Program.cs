@@ -17,9 +17,11 @@ app.MapWindow("/list", () => $"""
     <!doctype html>
     <html>
         <head>
-            <title>Clean</title>
+            {$"<title>Clean {name} {c}!</title>"}
         </head>
         <body>
+            {$"<h1>Hello {c:c} {name}!</h1>"}
+
             {GetList()}
         </body>
     </html>
@@ -130,7 +132,7 @@ var window = app.MapWindow("/app", () => $"""
     <!doctype html>
     <html>
         <head>
-            <title>Neato</title>
+            <title>Neato 123!</title>
         </head>
         <body style={$"background-color: {color}"}>
             <button onmousedown={() => c++}>
@@ -139,6 +141,7 @@ var window = app.MapWindow("/app", () => $"""
             {c:c} and {d:c}
 
             {$"<div>one {name} {c} four</div>"}
+            {(Html)$"<div>one {name} {c} four</div>"}
             {MyButton(text: "Nice to repeat you")}
             {MyButton(text: "Nice to repeat you")}
 

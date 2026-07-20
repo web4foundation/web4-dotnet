@@ -222,7 +222,7 @@ public partial class JsonRpcWriter : IDisposable
 
         _jsonWriter.WriteStartArray("params");
 
-        WriteHtml(buffer, param1);
+        WriteHtml(buffer, keyholes: param1, key: method.Item2);
         _jsonWriter.WriteStringValueSegment("", true);
 
         if (param2.HasValue)
@@ -377,12 +377,23 @@ public partial class JsonRpcWriter : IDisposable
         OnMessageEnd();
     }
     
-    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes)
+    private void WriteHtml(Keyhole[] buffer, Span<Keyhole> keyholes, byte[]? key = null)
     {
+        #if DEBUG
+        var isHeaderOmitted = false;
+        #endif
+
         for (int i = 1; i < keyholes.Length; i += 2)
         {
-            ref var literal = ref keyholes[i - 1];
             ref var keyhole = ref keyholes[i];
+            ref var immutable = ref keyholes[i - 1];
+            var literal = immutable.StringLiteral!;
+
+            #if DEBUG
+            if (i == 1 && key == Reconciler.ROOT_KEY)
+                isHeaderOmitted = InjectKernel(ref literal);
+            #endif
+
             bool isAttribute = WriteStringLiteral(ref literal, ref keyhole, out var attributeName);
 
             switch (keyhole.Type)
@@ -433,14 +444,19 @@ public partial class JsonRpcWriter : IDisposable
 
         ref var lastLiteral = ref keyholes[^1];
         _jsonWriter.WriteStringValueSegment(lastLiteral.StringLiteral, false);
+
+        #if DEBUG
+        if (isHeaderOmitted)
+            _jsonWriter.WriteStringValueSegment("</body></html>", false);
+        #endif
     }
 
-    private bool WriteStringLiteral(ref Keyhole literal, ref Keyhole keyhole, out ReadOnlySpan<char> attributeName)
+    private bool WriteStringLiteral(ref string literal, ref Keyhole keyhole, out ReadOnlySpan<char> attributeName)
     {
-        var isAttribute = literal.StringLiteral?.EndsWith('=') ?? false;
+        var isAttribute = literal.EndsWith('=');
         if (!isAttribute || keyhole.Type != KeyholeType.Boolean)
         {
-            _jsonWriter.WriteStringValueSegment(literal.StringLiteral, false);
+            _jsonWriter.WriteStringValueSegment(literal, false);
             attributeName = default;
             return isAttribute;
         }
@@ -448,7 +464,7 @@ public partial class JsonRpcWriter : IDisposable
         // Boolean attributes are "special".  
         // For example <input checked="false" /> means checked is true.  🤦
         // The only way to make a boolean attribute false is to omit it entirely.
-        var span = literal.StringLiteral.AsSpan();
+        var span = literal.AsSpan();
         int indexBeforeAttribute = span.LastIndexOf(' ');
         _jsonWriter.WriteStringValueSegment(
             keyhole.Boolean 
@@ -684,4 +700,38 @@ public partial class JsonRpcWriter : IDisposable
     {
         _jsonWriter.Dispose();
     }
+
+    #if DEBUG
+    private bool InjectKernel(ref string literal)
+    {
+        // NOTE! This only ever runs in DEBUG mode. Memory allocations are acceptable.
+
+        int headIndex = literal.IndexOf("<head>", StringComparison.Ordinal);
+        bool isHeadOmitted = headIndex < 0;
+        headIndex += 6;
+
+        string injected = isHeadOmitted
+            ? "<!doctype html><html><head>"
+            : literal[..headIndex];
+        
+        injected += """
+
+                <!-- Injected by XTML -->
+                <script src="/_app/websocket/ui.js" defer></script>
+                <link href="/_app/base/ui.css" rel="stylesheet" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+                <meta charset="UTF-8">
+
+        """;
+
+        if (isHeadOmitted)
+            injected += "</head><body>";
+        else
+            literal = literal[headIndex..];
+        
+        _jsonWriter.WriteStringValueSegment(injected, false);
+
+        return isHeadOmitted;
+    }
+    #endif
 }

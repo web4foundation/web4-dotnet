@@ -40,6 +40,9 @@ public partial class Bridge(HttpContext httpContext, WindowBuilder windowBuilder
                 bridge.Reconcile();
             }
         };
+
+        // HotReload only works in Retain mode.
+        SnapshotStrategy = SnapshotStrategy.Retain;
     }
     #endif
 
