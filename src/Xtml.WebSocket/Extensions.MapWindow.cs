@@ -57,11 +57,16 @@ public static partial class Extensions
         {
             applicationBuilder.Properties["IS_XTML_MAPPED"] = true;
 
-            app.Map("/_app/websocket/ui.js", (HttpContext context) =>
-                WriteAsset(context, "text/javascript", AssetsHelper.GetJs(context.Request.Headers.AcceptEncoding.ToString())));
+            app.Map("/_app/websocket/ui.js", (HttpContext context) => {
+                context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+                WriteAsset(context, "text/javascript", AssetsHelper.GetJs(context.Request.Headers.AcceptEncoding.ToString()));
+            });
 
-            app.Map("/_app/base/ui.css", (HttpContext context) =>
-                WriteAsset(context, "text/css", AssetsHelper.GetCss(context.Request.Headers.AcceptEncoding.ToString())));
+            app.Map("/_app/base/ui.css", (HttpContext context) => {
+                context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+                WriteAsset(context, "text/css", AssetsHelper.GetCss(context.Request.Headers.AcceptEncoding.ToString()));
+            });
+                
 
             app.Map("/_app/alive", async httpContext =>
             {

@@ -128,6 +128,7 @@ class Keyhole {
 
     if (this.key == 'root') {
       const newDoc = new DOMParser().parseFromString(rawHtml, 'text/html');
+      newDoc.head.registerKeyholes('head');
       document.head.replaceWith(newDoc.head);
       if (!window["_hot_reload_warning"]) {
         console.warn("The root template has been modified so <head> and <body> must be replaced.  This is only possible in DEBUG mode.");
