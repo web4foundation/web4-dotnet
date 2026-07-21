@@ -386,10 +386,10 @@ public class HtmlKeyComposer(IBufferWriter<byte> writer, WindowBuilder window)
                 _deferredLiteral = literal.AsMemory(offset);
             else
                 Writer.Write(literal.AsSpan(offset));
-        }
 
-        // Clear the literal since we've already written it out, and we don't want it to be written again by the next OnMarkup.
-        literal = string.Empty;
+            // Clear the literal since we've already written it out, and we don't want it to be written again by the next OnMarkup.
+            literal = string.Empty;
+        }
     }
 
     private void InjectTransition(string transition)
