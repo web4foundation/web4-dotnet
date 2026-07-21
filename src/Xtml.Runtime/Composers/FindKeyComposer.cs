@@ -43,7 +43,7 @@ public class FindKeyComposer : BaseKeyComposer
         return result;
     }
 
-    // Note: Returning false shortcircuits InterpolatedStringHandler from calling any
+    // Note: Returning false short circuits InterpolatedStringHandler from calling any
     // subsequent AppendFormatted() or AppendLiteral() methods.  
     // And isFound is used to trickle that upwards to all parent Htmls.
     
